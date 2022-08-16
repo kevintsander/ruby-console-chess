@@ -1,0 +1,130 @@
+@startuml
+
+class GameLogger <<mixin>> {
+  +log: []
+  +log_turn(turn, player, move_type, moves, captured_unit, promoted_unit)
+}
+
+class Game {
+  +players
+  +board
+  +turn
+  +game_log
+  +current_player
+  +play_game()
+  +play_turn()
+  +game_over?()
+  +update_log(move_type, location)
+  +save(id)
+  +load(save_id)
+}
+
+Game *-- GameLogger
+
+class Board {
+  +units
+  +allowed_moves(unit)
+  +display()
+  +unit(location)
+  +defender_blocking?(unit, location)
+}
+
+Game *-- Board
+
+class BoardStatus <<mixin>> {
+  +check?()
+  +checkmate?()
+  +stalemate?()
+}
+
+Board *-- BoardStatus
+
+class BoardMoveChecker <<mixin>> {
+  +can_kingside_castle?(unit)
+  +can_queenside_castle?(unit)
+  +can_en_passant?(unit, move_location)
+  +defender_blocking?(unit, move_location)
+  +would_be_check?(unit, move_location)
+  +can_promote?(unit)
+}
+
+Board *-- BoardMoveChecker
+
+class BoardActions <<mixin>> {
+  +move_unit(unit, location)
+  +kingside_castle(units)
+  +queenside_castle(units)
+  +en_passant(unit, location)
+  +promote_unit(unit, location)
+}
+
+Board *-- BoardActions
+
+class BoardLocationMapper <<mixin>> {
+  +MAP
+  +location_delta(from_location, to_location)
+  +delta_location(from_location, delta)
+  +out_of_bounds?(from_location, delta)
+}
+
+Board *-- BoardLocationMapper
+
+
+class Player {
+  +name
+  +{abstract} get_location()
+  +{abstract} get_promote_unit_type()
+}
+
+Game o--Player
+Unit o--Player
+
+class HumanPlayer {
+  +new(name)
+  +get_location()
+  +get_promote_unit_type()
+}
+
+Player <|-- HumanPlayer
+
+class PlaybackPlayer {
+  -move_queue
+  +new(name, move_queue)
+  +get_location()
+  +get_promote_unit_type()
+}
+
+Player <|-- PlaybackPlayer
+
+class Unit {
+  +player
+  +id
+  +symbol
+  +location
+  +new(location, player, id = location)
+  +captured?()
+  +capture()
+  +allowed_move_deltas()
+  +move(location)
+}
+
+Board o-- Unit
+
+/' I want this to work so that it updates various parts of display from observing 
+and what about asking for promoted piece? '/
+class ConsoleDisplayer {
+  display_board()
+  display_log()
+  display_turn_section()
+  display_ask_piece()
+  display_ask_promote_type()
+  display_possible_locations()
+}
+
+Unit <|-- Knight
+Unit <|-- Queen
+Unit <|-- Rook
+Unit <|-- Bishop
+Unit <|-- Pawn
+Unit <|-- King
+@enduml
