@@ -21,10 +21,16 @@ module BoardLocationMapper
     nil
   end
 
-  def location_delta(from_location, to_location)
-    from_coordinates = location_coordinates(from_location)
-    to_coordinates = location_coordinates(to_location)
-    [to_coordinates[0] - from_coordinates[0], to_coordinates[1] - from_coordinates[1]]
+  def coordinates_location(coordinates)
+    MAP[coordinates[0]][coordinates[1]]
+  end
+
+  def coordinates_delta(from, to)
+    [to[0] - from[0], to[1] - from[1]]
+  end
+
+  def move_coordinates(coordinates, vector)
+    [coordinates[0] + vector[0], coordinates[1] + vector[1]]
   end
 
   def direction(delta)

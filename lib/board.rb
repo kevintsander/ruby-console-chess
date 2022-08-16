@@ -25,21 +25,19 @@ class Board
     units.select { |unit| unit.location == location }&.first
   end
 
-  def defender_blocking_move?(unit, move_location)
-    delta = location_delta(unit.location, move_location)
+  def defender_blocking_move?(to_coordinates, from_coordinates)
+    delta = coordinates_delta(from_coordinates, to_coordinates)
     direction = direction(delta)
-    check_move = direction
-    until check_move == delta
-      return true if unit(check_move)
+    check_coordinates = from_coordinates
+    until check_coordinates == to_coordinates
+      return true if unit(coordinates_location(check_coordinates))
 
-      check_move = [check_move[0] + direction[0], check_move[1] + direction[1]]
+      check_coordinates = move_coordinates(check_coordinates, direction)
     end
     false
   end
 
   private
-
-  def defender_blocking_side_move?(unit, location); end
 
   def create_units
     @units ||= []
