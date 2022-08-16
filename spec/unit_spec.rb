@@ -5,14 +5,26 @@ require './lib/unit'
 describe Unit do
   let(:player) { double('player', color: :black) }
 
+  describe '#initialize' do
+    context 'starts on rank 2' do
+      subject(:unit_new) { described_class.new('g2', player) }
+      it 'sets forward to positive' do
+        expect(unit_new.forward).to eq(:+)
+      end
+    end
+    context 'starts on rank 7'
+  end
+
   describe '#captured?' do
     context 'unit has no location' do
-      subject(:unit_captured) { described_class.new(nil, player) }
+      subject(:unit_captured) { described_class.new('g5', player) }
 
       it 'returns true' do
+        unit_captured.instance_variable_set(:@location, nil)
         expect(unit_captured).to be_captured
       end
     end
+
     context 'unit has a location' do
       subject(:unit_alive) { described_class.new('g5', player) }
       it 'returns false' do
