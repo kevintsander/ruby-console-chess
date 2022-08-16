@@ -3,7 +3,8 @@
 require './lib/unit'
 
 describe Unit do
-  let(:player) { double('player') }
+  let(:player) { double('player', color: :black) }
+
   describe '#captured?' do
     context 'unit has no location' do
       subject(:unit_captured) { described_class.new(nil, player) }

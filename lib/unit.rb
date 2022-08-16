@@ -1,12 +1,18 @@
 # frozen_string_literal: true
 
+require './lib/unit_symbol_mapper'
+
+# Represents an abstract chess unit
 class Unit
-  attr_reader :location, :player, :id
+  include UnitSymbolMapper
+
+  attr_reader :location, :player, :id, :symbol
 
   def initialize(location, player, id = location)
     @location = location
     @player = player
     @id = id
+    @symbol = get_color_symbol(player.color)
   end
 
   def captured?
