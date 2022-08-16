@@ -8,14 +8,14 @@ class Unit
   include UnitSymbolMapper
   include LocationRankAndFile
 
-  attr_reader :location, :player, :id, :symbol, :forward, :allowed_move_deltas
+  attr_reader :location, :player, :id, :symbol, :allowed_move_deltas, :initial_rank
 
   def initialize(location, player, id = location)
     @location = location
     @player = player
     @id = id
     @symbol = get_color_symbol(player.color)
-    @forward = initial_forward
+    @initial_rank = rank(location)
   end
 
   def captured?
@@ -30,11 +30,9 @@ class Unit
     @location = location
   end
 
-  private
-
   # Gets forward location based on initial location, to be used by constructor
-  def initial_forward
-    case rank(@location)
+  def forward
+    case initial_rank
     when '2'
       :+
     when '7'
