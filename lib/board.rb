@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require './lib/location_rank_and_file'
+require './lib/board_location_mapper'
 require './lib/units/king'
 require './lib/units/queen'
 require './lib/units/bishop'
@@ -9,6 +11,9 @@ require './lib/units/pawn'
 
 # Represents a chess board
 class Board
+  include LocationRankAndFile
+  include BoardLocationMapper
+
   attr_reader :players, :units
 
   def initialize(players)
@@ -16,7 +21,25 @@ class Board
     create_units
   end
 
+  def unit(location)
+    units.select { |unit| unit.location == location }&.first
+  end
+
+  def defender_blocking_move?(unit, move_location)
+    delta = location_delta(unit.location, move_location)
+    direction = direction(delta)
+    check_move = direction
+    until check_move == delta
+      return true if unit(check_move)
+
+      check_move = [check_move[0] + direction[0], check_move[1] + direction[1]]
+    end
+    false
+  end
+
   private
+
+  def defender_blocking_side_move?(unit, location); end
 
   def create_units
     @units ||= []

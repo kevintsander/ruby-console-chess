@@ -28,11 +28,40 @@ describe Board do
     end
   end
 
+  describe '#unit' do
+    subject(:board) { described_class.new([player1, player2]) }
+    let(:unit) { double('unit', location: 'g3') }
+
+    before do
+      allow(board).to receive(:units).and_return([unit])
+    end
+
+    context 'a unit is at the location' do
+      it 'return true' do
+        result = board.unit('g3')
+        expect(result).to be(unit)
+      end
+    end
+    context 'a unit is not at the location' do
+      it 'return true' do
+        result = board.unit('c2')
+        expect(result).to be_nil
+      end
+    end
+  end
+
   describe '#defender_blocking_move?' do
     context 'horizontal move with no defenders between' do
-      subject(:board_block_h) { described_class.new }
+      subject(:board_block_h) { described_class.new([player1, player2]) }
+      let(:move_unit) { double('unit', location: 'c5') }
 
-      xit 'returns false' do
+      before do
+        allow(board_block_h).to receive(:unit).and_return(nil)
+      end
+
+      it 'returns false' do
+        result = board_block_h.defender_blocking_move?(move_unit, 'g5')
+        expect(result).to be_true
       end
     end
     context 'horizontal move with defenders between' do
