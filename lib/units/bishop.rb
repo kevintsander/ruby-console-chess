@@ -6,13 +6,13 @@ require './lib/unit'
 class Bishop < Unit
   def initialize(location, player, id = location)
     super(location, player, id)
-    @allowed_move_deltas = { standard: bishop_deltas_all_move_types,
-                             attack: bishop_deltas_all_move_types }
+    @allowed_move_deltas = { move_standard: bishop_deltas,
+                             move_attack: bishop_deltas }
   end
 
   private
 
-  def bishop_deltas_all_move_types
+  def bishop_deltas
     (1..7).reduce([]) { |all, dist| all + [[dist, dist], [dist, -dist], [-dist, dist], [-dist, -dist]] }
   end
 end
