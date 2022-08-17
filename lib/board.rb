@@ -25,8 +25,9 @@ class Board
     units.select { |unit| unit.location == location }&.first
   end
 
-  def unit_blocking_move?(unit, to_coordinates)
+  def unit_blocking_move?(unit, to_location)
     from_coordinates = location_coordinates(unit.location)
+    to_coordinates = location_coordinates(to_location)
     delta = coordinates_delta(from_coordinates, to_coordinates)
     direction = direction(delta)
     check_coordinates = from_coordinates

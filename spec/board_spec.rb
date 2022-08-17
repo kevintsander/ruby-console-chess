@@ -64,8 +64,7 @@ describe Board do
       end
 
       it 'returns false' do
-        to_coordinates = board_block.location_coordinates('g5')
-        expect(board_block).not_to be_unit_blocking_move(move_unit, to_coordinates)
+        expect(board_block).not_to be_unit_blocking_move(move_unit, 'g5')
       end
     end
 
@@ -75,13 +74,12 @@ describe Board do
       let(:unfriendly_unit) { double('unit', location: 'g3', player: player2) }
 
       it 'returns true' do
-        to_coordinates = board_block.location_coordinates('g5')
         # check unfriendly
         allow(board_block).to receive(:units).and_return([move_unit, unfriendly_unit])
-        expect(board_block).to be_unit_blocking_move(move_unit, to_coordinates)
+        expect(board_block).to be_unit_blocking_move(move_unit, 'g5')
         # check friendly
         allow(board_block).to receive(:units).and_return([move_unit, friendly_unit])
-        expect(board_block).to be_unit_blocking_move(move_unit, to_coordinates)
+        expect(board_block).to be_unit_blocking_move(move_unit, 'g5')
       end
     end
     context 'diagonal move with no units between' do
@@ -94,8 +92,7 @@ describe Board do
       end
 
       it 'returns false' do
-        to_coordinates = board_block.location_coordinates('h8')
-        expect(board_block).not_to be_unit_blocking_move(move_unit, to_coordinates)
+        expect(board_block).not_to be_unit_blocking_move(move_unit, 'h8')
       end
     end
 
@@ -105,13 +102,12 @@ describe Board do
       let(:unfriendly_unit) { double('unit', location: 'f6', player: player2) }
 
       it 'returns true' do
-        to_coordinates = board_block.location_coordinates('h8')
         # check unfriendly
         allow(board_block).to receive(:units).and_return([move_unit, unfriendly_unit])
-        expect(board_block).to be_unit_blocking_move(move_unit, to_coordinates)
+        expect(board_block).to be_unit_blocking_move(move_unit, 'h8')
         # check friendly
         allow(board_block).to receive(:units).and_return([move_unit, friendly_unit])
-        expect(board_block).to be_unit_blocking_move(move_unit, to_coordinates)
+        expect(board_block).to be_unit_blocking_move(move_unit, 'h8')
       end
     end
 
@@ -121,8 +117,7 @@ describe Board do
 
       it 'returns true' do
         allow(board_block).to receive(:units).and_return([move_unit, friendly_unit])
-        to_coordinates = board_block.location_coordinates('d4')
-        expect(board_block).to be_unit_blocking_move(move_unit, to_coordinates)
+        expect(board_block).to be_unit_blocking_move(move_unit, 'd4')
       end
     end
 
@@ -132,8 +127,7 @@ describe Board do
 
       it 'returns false' do
         allow(board_block).to receive(:units).and_return([move_unit, unfriendly_unit])
-        to_coordinates = board_block.location_coordinates('d4')
-        expect(board_block).not_to be_unit_blocking_move(move_unit, to_coordinates)
+        expect(board_block).not_to be_unit_blocking_move(move_unit, 'd4')
       end
     end
   end
