@@ -2,6 +2,7 @@
 
 require './lib/location_rank_and_file'
 require './lib/board_location_mapper'
+require './lib/board_move_checker'
 require './lib/units/king'
 require './lib/units/queen'
 require './lib/units/bishop'
@@ -13,6 +14,7 @@ require './lib/units/pawn'
 class Board
   include LocationRankAndFile
   include BoardLocationMapper
+  include BoardMoveChecker
 
   attr_reader :players, :units
 
@@ -43,58 +45,23 @@ class Board
   end
 
   def allowed_moves(unit)
-    allowed_locations(unit)
-  end
-
-  private
-
-  # converts a unit allowed deltas to allowed locations
-  def allowed_locations(unit)
     unit.allowed_move_deltas.each_with_object({}) do |(action, deltas), new_hash|
-      locations = []
-      deltas.each do |delta|
-        unit_coordinates = location_coordinates(unit.location)
-        location = coordinates_location(move_coordinates(unit_coordinates, delta))
-        break unless location
-
-        case action
-        when :move_standard
-          break unless can_move_standard?(unit, location)
-        when :move_attack
-          break unless can_move_attack?(unit, location)
-        when :jump_standard
-          break unless can_jump_standard?(unit, location)
-        when :jump_attack
-          break unless can_jump_attack?(unit, location)
-        when :en_passant
-          break
-        when :kingside_castle
-          break
-        when :queenside_castle
-          break
-        end
-
-        locations << location
-      end
-      new_hash[action] = locations if locations.any?
+      locations = allowed_action_locations(unit, action, deltas)
+      new_hash[action] = locations if locations&.any?
       new_hash
     end
   end
 
-  def can_move_standard?(unit, move_location)
-    !enemy_unit_at(unit.player, move_location) && !unit_blocking_move?(unit, move_location)
-  end
+  private
 
-  def can_move_attack?(unit, move_location)
-    enemy_unit_at(unit.player, move_location) && !unit_blocking_move?(unit, move_location)
-  end
+  def allowed_action_locations(unit, action, deltas)
+    deltas.reduce([]) do |locations, delta|
+      location = delta_location(unit.location, delta)
+      break unless location # out of bounds?
+      break unless can_perform_action?(unit, location, action)
 
-  def can_jump_standard?(unit, move_location)
-    !unit_at(unit.player, move_location)
-  end
-
-  def can_jump_attack?(unit, move_location)
-    enemy_unit_at(unit.player, move_location) ? true : false
+      locations << location
+    end
   end
 
   def create_units

@@ -21,6 +21,12 @@ module BoardLocationMapper
     nil
   end
 
+  def delta_location(location, delta)
+    location_coordinates = location_coordinates(location)
+    move_coordinates = move_coordinates(location_coordinates, delta)
+    coordinates_location(move_coordinates)
+  end
+
   def coordinates_location(coordinates)
     MAP[coordinates[0]][coordinates[1]]
   end
