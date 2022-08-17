@@ -37,4 +37,11 @@ module BoardLocationMapper
     greatest_common = delta[0].gcd(delta[1])
     [delta[0] / greatest_common, delta[1] / greatest_common]
   end
+
+  def step_location(from_location, to_location)
+    from_coordinates = location_coordinates(from_location)
+    to_coordinates = location_coordinates(to_location)
+    direction = direction(coordinates_delta(from_coordinates, to_coordinates))
+    coordinates_location(move_coordinates(from_coordinates, direction))
+  end
 end

@@ -26,16 +26,13 @@ class Board
   end
 
   def unit_blocking_move?(unit, to_location)
-    from_coordinates = location_coordinates(unit.location)
-    to_coordinates = location_coordinates(to_location)
-    delta = coordinates_delta(from_coordinates, to_coordinates)
-    direction = direction(delta)
-    check_coordinates = from_coordinates
-    until check_coordinates == to_coordinates
-      check_coordinates = move_coordinates(check_coordinates, direction)
-      unit_at_location = unit(coordinates_location(check_coordinates))
+    check_location = unit.location
+    until check_location == to_location
+      check_location = step_location(check_location, to_location)
+      unit_at_location = unit(check_location)
 
-      return true if unit_at_location && (unit_at_location.player == unit.player || check_coordinates != to_coordinates)
+      # blocking if a unit found in the path, unless it is an unfriendly unit on the final space
+      return true if unit_at_location && (unit_at_location.player == unit.player || check_location != to_location)
     end
     false
   end
