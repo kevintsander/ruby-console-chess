@@ -32,7 +32,9 @@ class Board
     check_coordinates = from_coordinates
     until check_coordinates == to_coordinates
       check_coordinates = move_coordinates(check_coordinates, direction)
-      return true if unit(coordinates_location(check_coordinates))
+      unit_at_location = unit(coordinates_location(check_coordinates))
+
+      return true if unit_at_location && (unit_at_location.player == unit.player || check_coordinates != to_coordinates)
     end
     false
   end

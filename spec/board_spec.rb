@@ -55,11 +55,12 @@ describe Board do
     subject(:board_block) { described_class.new([player1, player2]) }
 
     context 'horizontal move with no other units between' do
-      let(:move_unit) { double('unit', location: 'g2') }
-      let(:other_unit) { double('unit', location: 'c3') }
+      let(:move_unit) { double('unit', location: 'g2', player: player1) }
+      let(:friendly_unit) { double('unit', location: 'c3', player: player1) }
+      let(:unfriendly_unit) { double('unit', location: 'a1', player: player2) }
 
       before do
-        allow(board_block).to receive(:units).and_return([move_unit, other_unit])
+        allow(board_block).to receive(:units).and_return([move_unit, friendly_unit, unfriendly_unit])
       end
 
       it 'returns false' do
@@ -68,25 +69,28 @@ describe Board do
       end
     end
 
-    context 'horizontal move with defenders between' do
-      let(:move_unit) { double('unit', location: 'g2') }
-      let(:blocking_unit) { double('unit', location: 'g4') }
-
-      before do
-        allow(board_block).to receive(:units).and_return([move_unit, blocking_unit])
-      end
+    context 'horizontal move with defenders or friendly units between' do
+      let(:move_unit) { double('unit', location: 'g2', player: player1) }
+      let(:friendly_unit) { double('unit', location: 'g4', player: player1) }
+      let(:unfriendly_unit) { double('unit', location: 'g3', player: player2) }
 
       it 'returns true' do
         to_coordinates = board_block.location_coordinates('g5')
+        # check unfriendly
+        allow(board_block).to receive(:units).and_return([move_unit, unfriendly_unit])
+        expect(board_block).to be_unit_blocking_move(move_unit, to_coordinates)
+        # check friendly
+        allow(board_block).to receive(:units).and_return([move_unit, friendly_unit])
         expect(board_block).to be_unit_blocking_move(move_unit, to_coordinates)
       end
     end
-    context 'diagonal move with no defenders between' do
-      let(:move_unit) { double('unit', location: 'b2') }
-      let(:other_unit) { double('unit', location: 'd5') }
+    context 'diagonal move with no units between' do
+      let(:move_unit) { double('unit', location: 'b2', player: player1) }
+      let(:friendly_unit) { double('unit', location: 'd5', player: player1) }
+      let(:unfriendly_unit) { double('unit', location: 'e8', player: player2) }
 
       before do
-        allow(board_block).to receive(:units).and_return([move_unit, other_unit])
+        allow(board_block).to receive(:units).and_return([move_unit, friendly_unit, unfriendly_unit])
       end
 
       it 'returns false' do
@@ -94,17 +98,42 @@ describe Board do
         expect(board_block).not_to be_unit_blocking_move(move_unit, to_coordinates)
       end
     end
-    context 'diagonal move with defenders between' do
-      let(:move_unit) { double('unit', location: 'b2') }
-      let(:blocking_unit) { double('unit', location: 'd4') }
 
-      before do
-        allow(board_block).to receive(:units).and_return([move_unit, blocking_unit])
-      end
+    context 'diagonal move with defenders or friendly units between' do
+      let(:move_unit) { double('unit', location: 'b2', player: player1) }
+      let(:friendly_unit) { double('unit', location: 'd4', player: player1) }
+      let(:unfriendly_unit) { double('unit', location: 'f6', player: player2) }
 
       it 'returns true' do
         to_coordinates = board_block.location_coordinates('h8')
+        # check unfriendly
+        allow(board_block).to receive(:units).and_return([move_unit, unfriendly_unit])
         expect(board_block).to be_unit_blocking_move(move_unit, to_coordinates)
+        # check friendly
+        allow(board_block).to receive(:units).and_return([move_unit, friendly_unit])
+        expect(board_block).to be_unit_blocking_move(move_unit, to_coordinates)
+      end
+    end
+
+    context 'friendly unit on move space' do
+      let(:move_unit) { double('unit', location: 'b2', player: player1) }
+      let(:friendly_unit) { double('unit', location: 'd4', player: player1) }
+
+      it 'returns true' do
+        allow(board_block).to receive(:units).and_return([move_unit, friendly_unit])
+        to_coordinates = board_block.location_coordinates('d4')
+        expect(board_block).to be_unit_blocking_move(move_unit, to_coordinates)
+      end
+    end
+
+    context 'unfriendly unit on move space' do
+      let(:move_unit) { double('unit', location: 'b2', player: player1) }
+      let(:unfriendly_unit) { double('unit', location: 'd4', player: player2) }
+
+      it 'returns false' do
+        allow(board_block).to receive(:units).and_return([move_unit, unfriendly_unit])
+        to_coordinates = board_block.location_coordinates('d4')
+        expect(board_block).not_to be_unit_blocking_move(move_unit, to_coordinates)
       end
     end
   end
