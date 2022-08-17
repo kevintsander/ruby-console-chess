@@ -28,7 +28,11 @@ module BoardLocationMapper
   end
 
   def coordinates_location(coordinates)
-    MAP[coordinates[0]][coordinates[1]]
+    row = coordinates[0]
+    col = coordinates[1]
+    return unless row.between?(0, MAP.size - 1) && col.between?(0, MAP[row].size - 1)
+
+    MAP[row][col]
   end
 
   def coordinates_delta(from, to)

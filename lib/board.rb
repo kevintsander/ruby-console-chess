@@ -52,8 +52,8 @@ class Board
   def allowed_action_locations(unit, action, deltas)
     deltas.reduce([]) do |locations, delta|
       location = delta_location(unit.location, delta)
-      break unless location # out of bounds?
-      break unless can_perform_action?(unit, location, action)
+      next locations unless location # out of bounds?
+      next locations unless can_perform_action?(unit, location, action)
 
       locations << location
     end

@@ -138,9 +138,44 @@ describe Board do
     context 'moves inside boundary' do
       it 'returns all moves' do
         pawn_unit = Pawn.new('c3', white_player)
-        allow(board_allowed).to receive(:units).and_return([pawn_unit])
-        result = board_allowed.allowed_actions(pawn_unit)
-        expect(result).to eq({ move_standard: ['c4'] })
+        knight_unit = Knight.new('e5', black_player)
+        king_unit = King.new('f6', white_player)
+        allow(board_allowed).to receive(:units).and_return([pawn_unit], [knight_unit], [king_unit])
+        pawn_result = board_allowed.allowed_actions(pawn_unit)
+        knight_result = board_allowed.allowed_actions(knight_unit)
+        king_result = board_allowed.allowed_actions(king_unit)
+
+        expect(pawn_result[:move_standard].sort).to eq(%w[c4].sort)
+        expect(knight_result[:jump_standard].sort).to eq(%w[g4 f3 g6 f7 d7 c6 c4 d3].sort)
+        expect(king_result[:move_standard].sort).to eq(%w[g5 g6 g7 f5 f7 e5 e6 e7].sort)
+      end
+    end
+
+    context 'moves outside of boundary' do
+      it 'limits moves' do
+        pawn_unit = Pawn.new('c8', white_player)
+        rook_unit = Rook.new('c3', black_player)
+        knight_unit = Knight.new('h8', black_player)
+        bishop_unit = Bishop.new('e2', white_player)
+        queen_unit = Queen.new('b7', black_player)
+        king_unit = King.new('h8', white_player)
+
+        allow(board_allowed).to receive(:units).and_return([pawn_unit], [rook_unit], [bishop_unit], [queen_unit],
+                                                           [king_unit])
+        pawn_result = board_allowed.allowed_actions(pawn_unit)
+        rook_result = board_allowed.allowed_actions(rook_unit)
+        knight_result = board_allowed.allowed_actions(knight_unit)
+        bishop_result = board_allowed.allowed_actions(bishop_unit)
+        queen_result = board_allowed.allowed_actions(queen_unit)
+        king_result = board_allowed.allowed_actions(king_unit)
+
+        expect(pawn_result).to be_empty
+        expect(rook_result[:move_standard].sort).to eq(%w[c1 c2 c4 c5 c6 c7 c8 a3 b3 d3 e3 f3 g3 h3].sort)
+        expect(knight_result[:jump_standard].sort).to eq(%w[f7 g6].sort)
+        expect(bishop_result[:move_standard].sort).to eq(%w[d1 f1 d3 c4 b5 a6 f3 g4 h5].sort)
+        expect(queen_result[:move_standard].sort).to eq(%w[a8 a7 a6 b8 c8 c7 d7 e7 f7 g7 h7 c6 d5 e4 f3 g2 h1 b6 b5 b4
+                                                           b3 b2 b1].sort)
+        expect(king_result[:move_standard].sort).to eq(%w[h7 g7 g8].sort)
       end
     end
 
