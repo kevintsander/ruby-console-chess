@@ -46,6 +46,7 @@ class BoardMoveChecker <<mixin>> {
   +defender_blocking?(unit, move_location)
   +would_be_check?(unit, move_location)
   +can_promote?(unit)
+  +filter_moves(unit)
 }
 
 Board *-- BoardMoveChecker

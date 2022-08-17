@@ -51,10 +51,10 @@ describe Board do
     end
   end
 
-  describe '#defender_blocking_move?' do
+  describe '#unit_blocking_move?' do
     subject(:board_block) { described_class.new([player1, player2]) }
 
-    context 'horizontal move with no defenders between' do
+    context 'horizontal move with no other units between' do
       let(:move_unit) { double('unit', location: 'g2') }
       let(:other_unit) { double('unit', location: 'c3') }
 
@@ -63,10 +63,8 @@ describe Board do
       end
 
       it 'returns false' do
-        to_location = 'g5'
-        from_coordinates = board_block.location_coordinates(move_unit.location)
-        to_coordinates = board_block.location_coordinates(to_location)
-        expect(board_block).not_to be_defender_blocking_move(from_coordinates, to_coordinates)
+        to_coordinates = board_block.location_coordinates('g5')
+        expect(board_block).not_to be_unit_blocking_move(move_unit, to_coordinates)
       end
     end
 
@@ -79,11 +77,8 @@ describe Board do
       end
 
       it 'returns true' do
-        to_location = 'g5'
-        from_coordinates = board_block.location_coordinates(move_unit.location)
-        to_coordinates = board_block.location_coordinates(to_location)
-
-        expect(board_block).to be_defender_blocking_move(from_coordinates, to_coordinates)
+        to_coordinates = board_block.location_coordinates('g5')
+        expect(board_block).to be_unit_blocking_move(move_unit, to_coordinates)
       end
     end
     context 'diagonal move with no defenders between' do
@@ -95,11 +90,8 @@ describe Board do
       end
 
       it 'returns false' do
-        to_location = 'h8'
-        from_coordinates = board_block.location_coordinates(move_unit.location)
-        to_coordinates = board_block.location_coordinates(to_location)
-
-        expect(board_block).not_to be_defender_blocking_move(from_coordinates, to_coordinates)
+        to_coordinates = board_block.location_coordinates('h8')
+        expect(board_block).not_to be_unit_blocking_move(move_unit, to_coordinates)
       end
     end
     context 'diagonal move with defenders between' do
@@ -111,11 +103,8 @@ describe Board do
       end
 
       it 'returns true' do
-        to_location = 'h8'
-        from_coordinates = board_block.location_coordinates(move_unit.location)
-        to_coordinates = board_block.location_coordinates(to_location)
-
-        expect(board_block).to be_defender_blocking_move(from_coordinates, to_coordinates)
+        to_coordinates = board_block.location_coordinates('h8')
+        expect(board_block).to be_unit_blocking_move(move_unit, to_coordinates)
       end
     end
   end
