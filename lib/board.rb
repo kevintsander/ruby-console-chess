@@ -37,7 +37,47 @@ class Board
     false
   end
 
+  def allowed_moves(unit)
+    allowed_locations(unit)
+  end
+
   private
+
+  # converts a unit allowed deltas to allowed locations
+  def allowed_locations(unit)
+    unit.allowed_move_deltas.each_with_object({}) do |(action, deltas), new_hash|
+      locations = []
+      deltas.each do |delta|
+        unit_coordinates = location_coordinates(unit.location)
+        location = coordinates_location(move_coordinates(unit_coordinates, delta))
+        unit_at_location = unit(location)
+        break unless location
+
+        case action
+        when :move_standard
+          break if unit_blocking_move?(unit, location)
+        when :move_attack
+          break unless unit_at_location && unit_at_location.player != unit.player && unit_blocking_move?(unit, location)
+        when :jump_standard
+          break if unit_at_location
+        when :jump_attack
+          break unless unit_at_location && unit_at_location.player != unit.player
+        when :en_passant
+          break
+        when :kingside_castle
+          break
+        when :queenside_castle
+          break
+        end
+
+        locations << location
+      end
+      new_hash[action] = locations if locations.any?
+      new_hash
+    end
+  end
+
+  def filter_moves; end
 
   def create_units
     @units ||= []

@@ -3,13 +3,13 @@
 require './lib/board'
 
 describe Board do
-  let(:player1) { double('player1', color: :white) }
-  let(:player2) { double('player2', color: :black) }
+  let(:white_player) { double('white_player', color: :white) }
+  let(:black_player) { double('black_player', color: :black) }
 
   describe '#initialize' do
     it 'creates all chess game pieces' do
-      board = described_class.new([player1, player2])
-      [player1, player2].each do |player|
+      board = described_class.new([white_player, black_player])
+      [white_player, black_player].each do |player|
         player_units = board.units.select { |unit| unit.player == player }
 
         king_unit_count = player_units.count { |unit| unit.is_a?(King) }
@@ -29,7 +29,7 @@ describe Board do
   end
 
   describe '#unit' do
-    subject(:board) { described_class.new([player1, player2]) }
+    subject(:board) { described_class.new([white_player, black_player]) }
     let(:unit) { double('unit', location: 'g3') }
 
     before do
@@ -52,12 +52,12 @@ describe Board do
   end
 
   describe '#unit_blocking_move?' do
-    subject(:board_block) { described_class.new([player1, player2]) }
+    subject(:board_block) { described_class.new([white_player, black_player]) }
 
     context 'horizontal move with no other units between' do
-      let(:move_unit) { double('unit', location: 'g2', player: player1) }
-      let(:friendly_unit) { double('unit', location: 'c3', player: player1) }
-      let(:unfriendly_unit) { double('unit', location: 'a1', player: player2) }
+      let(:move_unit) { double('unit', location: 'g2', player: white_player) }
+      let(:friendly_unit) { double('unit', location: 'c3', player: white_player) }
+      let(:unfriendly_unit) { double('unit', location: 'a1', player: black_player) }
 
       before do
         allow(board_block).to receive(:units).and_return([move_unit, friendly_unit, unfriendly_unit])
@@ -69,9 +69,9 @@ describe Board do
     end
 
     context 'horizontal move with defenders or friendly units between' do
-      let(:move_unit) { double('unit', location: 'g2', player: player1) }
-      let(:friendly_unit) { double('unit', location: 'g4', player: player1) }
-      let(:unfriendly_unit) { double('unit', location: 'g3', player: player2) }
+      let(:move_unit) { double('unit', location: 'g2', player: white_player) }
+      let(:friendly_unit) { double('unit', location: 'g4', player: white_player) }
+      let(:unfriendly_unit) { double('unit', location: 'g3', player: black_player) }
 
       it 'returns true' do
         # check unfriendly
@@ -83,9 +83,9 @@ describe Board do
       end
     end
     context 'diagonal move with no units between' do
-      let(:move_unit) { double('unit', location: 'b2', player: player1) }
-      let(:friendly_unit) { double('unit', location: 'd5', player: player1) }
-      let(:unfriendly_unit) { double('unit', location: 'e8', player: player2) }
+      let(:move_unit) { double('unit', location: 'b2', player: white_player) }
+      let(:friendly_unit) { double('unit', location: 'd5', player: white_player) }
+      let(:unfriendly_unit) { double('unit', location: 'e8', player: black_player) }
 
       before do
         allow(board_block).to receive(:units).and_return([move_unit, friendly_unit, unfriendly_unit])
@@ -97,9 +97,9 @@ describe Board do
     end
 
     context 'diagonal move with defenders or friendly units between' do
-      let(:move_unit) { double('unit', location: 'b2', player: player1) }
-      let(:friendly_unit) { double('unit', location: 'd4', player: player1) }
-      let(:unfriendly_unit) { double('unit', location: 'f6', player: player2) }
+      let(:move_unit) { double('unit', location: 'b2', player: white_player) }
+      let(:friendly_unit) { double('unit', location: 'd4', player: white_player) }
+      let(:unfriendly_unit) { double('unit', location: 'f6', player: black_player) }
 
       it 'returns true' do
         # check unfriendly
@@ -112,8 +112,8 @@ describe Board do
     end
 
     context 'friendly unit on move space' do
-      let(:move_unit) { double('unit', location: 'b2', player: player1) }
-      let(:friendly_unit) { double('unit', location: 'd4', player: player1) }
+      let(:move_unit) { double('unit', location: 'b2', player: white_player) }
+      let(:friendly_unit) { double('unit', location: 'd4', player: white_player) }
 
       it 'returns true' do
         allow(board_block).to receive(:units).and_return([move_unit, friendly_unit])
@@ -122,12 +122,30 @@ describe Board do
     end
 
     context 'unfriendly unit on move space' do
-      let(:move_unit) { double('unit', location: 'b2', player: player1) }
-      let(:unfriendly_unit) { double('unit', location: 'd4', player: player2) }
+      let(:move_unit) { double('unit', location: 'b2', player: white_player) }
+      let(:unfriendly_unit) { double('unit', location: 'd4', player: black_player) }
 
       it 'returns false' do
         allow(board_block).to receive(:units).and_return([move_unit, unfriendly_unit])
         expect(board_block).not_to be_unit_blocking_move(move_unit, 'd4')
+      end
+    end
+  end
+
+  describe '#allowed_moves' do
+    subject(:board_allowed) { described_class.new([white_player, black_player]) }
+
+    context 'moves inside boundary' do
+      it 'returns all moves' do
+        pawn_unit = Pawn.new('c3', white_player)
+        allow(board_allowed).to receive(:units).and_return([pawn_unit])
+        result = board_allowed.allowed_moves(pawn_unit)
+        expect(result).to eq({ move_standard: ['c4'] })
+      end
+    end
+
+    context 'friendly units are blocking moves' do
+      xit 'returns all moves that are not out of bounds or blocked by friendly units' do
       end
     end
   end
