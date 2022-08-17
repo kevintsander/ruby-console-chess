@@ -32,10 +32,10 @@ class Unit
 
   # Gets forward location based on initial location, to be used by constructor
   def forward
-    case initial_rank
-    when '2'
+    case player.color
+    when :white
       :+
-    when '7'
+    when :black
       :-
     end
   end
