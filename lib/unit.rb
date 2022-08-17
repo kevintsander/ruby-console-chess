@@ -31,7 +31,7 @@ class Unit
   end
 
   def enemy?(other_unit)
-    player != other_unit.player
+    other_unit && player != other_unit.player
   end
 
   # Gets forward location based on initial location, to be used by constructor

@@ -3,31 +3,31 @@
 # Contains methods for checking possible board moves
 module BoardMoveChecker
   def can_move_standard?(unit, move_location)
-    !enemy_unit_at(unit.player, move_location) && !unit_blocking_move?(unit, move_location)
+    !unit.enemy?(unit_at(move_location)) && !unit_blocking_move?(unit, move_location)
   end
 
   def can_move_attack?(unit, move_location)
-    enemy_unit_at(unit.player, move_location) && !unit_blocking_move?(unit, move_location)
+    unit.enemy?(unit_at(move_location)) && !unit_blocking_move?(unit, move_location)
   end
 
-  def can_jump_standard?(unit, move_location)
-    !unit_at(unit.player, move_location)
+  def can_jump_standard?(move_location)
+    !unit_at(move_location)
   end
 
   def can_jump_attack?(unit, move_location)
-    enemy_unit_at(unit.player, move_location) ? true : false
+    unit.enemy?(unit_at(move_location))
   end
 
-  def can_perform_action?(unit, location, action)
+  def can_perform_action?(unit, move_location, action)
     case action
     when :move_standard
-      can_move_standard?(unit, location)
+      can_move_standard?(unit, move_location)
     when :move_attack
-      can_move_attack?(unit, location)
+      can_move_attack?(unit, move_location)
     when :jump_standard
-      can_jump_standard?(unit, location)
+      can_jump_standard?(move_location)
     when :jump_attack
-      can_jump_attack?(unit, location)
+      can_jump_attack?(unit, move_location)
     when :en_passant
       false
     when :kingside_castle

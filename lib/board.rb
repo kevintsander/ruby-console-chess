@@ -27,11 +27,6 @@ class Board
     units.select { |unit| unit.location == location }&.first
   end
 
-  def enemy_unit_at(player, location)
-    unit = unit_at(location)
-    unit if unit && unit.player != player
-  end
-
   def unit_blocking_move?(unit, to_location)
     check_location = unit.location
     until check_location == to_location
