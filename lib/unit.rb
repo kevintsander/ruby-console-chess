@@ -8,7 +8,7 @@ class Unit
   include UnitSymbolMapper
   include LocationRankAndFile
 
-  attr_reader :location, :player, :id, :symbol, :allowed_move_deltas, :initial_rank
+  attr_reader :location, :player, :id, :symbol, :allowed_actions_deltas, :initial_rank
 
   def initialize(location, player, id = location)
     @location = location

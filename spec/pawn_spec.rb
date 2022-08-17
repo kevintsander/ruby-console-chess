@@ -7,9 +7,9 @@ describe Pawn do
     let(:black_player) { double('black_player', name: 'player2', color: :black) }
     subject(:pawn_seven) { described_class.new('g7', black_player) }
     it 'can only attack or move to lower rank' do
-      move_ranks = pawn_seven.allowed_move_deltas[:move_standard].map { |item| item[0] }
-      attack_ranks = pawn_seven.allowed_move_deltas[:move_attack].map { |item| item[0] }
-      en_passant_ranks = pawn_seven.allowed_move_deltas[:en_passant].map { |item| item[0] }
+      move_ranks = pawn_seven.allowed_actions_deltas[:move_standard].map { |item| item[0] }
+      attack_ranks = pawn_seven.allowed_actions_deltas[:move_attack].map { |item| item[0] }
+      en_passant_ranks = pawn_seven.allowed_actions_deltas[:en_passant].map { |item| item[0] }
       expect(move_ranks).to include(-1)
       expect(move_ranks).not_to include(1)
       expect(attack_ranks).to include(-1)
@@ -23,9 +23,9 @@ describe Pawn do
     let(:white_player) { double('white_player', name: 'player1', color: :white) }
     subject(:pawn_two) { described_class.new('g2', white_player) }
     it 'can only attack or move to higher rank' do
-      move_ranks = pawn_two.allowed_move_deltas[:move_standard].map { |item| item[0] }
-      attack_ranks = pawn_two.allowed_move_deltas[:move_attack].map { |item| item[0] }
-      en_passant_ranks = pawn_two.allowed_move_deltas[:en_passant].map { |item| item[0] }
+      move_ranks = pawn_two.allowed_actions_deltas[:move_standard].map { |item| item[0] }
+      attack_ranks = pawn_two.allowed_actions_deltas[:move_attack].map { |item| item[0] }
+      en_passant_ranks = pawn_two.allowed_actions_deltas[:en_passant].map { |item| item[0] }
       expect(move_ranks).to include(1)
       expect(move_ranks).not_to include(-1)
       expect(attack_ranks).to include(1)

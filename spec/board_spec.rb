@@ -132,14 +132,14 @@ describe Board do
     end
   end
 
-  describe '#allowed_moves' do
+  describe '#allowed_actions' do
     subject(:board_allowed) { described_class.new([white_player, black_player]) }
 
     context 'moves inside boundary' do
       it 'returns all moves' do
         pawn_unit = Pawn.new('c3', white_player)
         allow(board_allowed).to receive(:units).and_return([pawn_unit])
-        result = board_allowed.allowed_moves(pawn_unit)
+        result = board_allowed.allowed_actions(pawn_unit)
         expect(result).to eq({ move_standard: ['c4'] })
       end
     end

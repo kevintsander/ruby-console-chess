@@ -105,7 +105,7 @@ class Unit {
   +new(location, player, id = location)
   +captured?()
   +capture()
-  +allowed_move_deltas()
+  +allowed_actions_deltas()
   +move(location)
 }
 

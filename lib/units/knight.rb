@@ -8,8 +8,8 @@ class Knight < Unit
 
   def initialize(location, player, id = location)
     super(location, player, id)
-    @allowed_move_deltas = { jump_standard: knight_deltas,
-                             jump_attack: knight_deltas }
+    @allowed_actions_deltas = { jump_standard: knight_deltas,
+                                jump_attack: knight_deltas }
   end
 
   private

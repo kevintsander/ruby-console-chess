@@ -6,8 +6,8 @@ require './lib/unit'
 class King < Unit
   def initialize(location, player, id = location)
     super(location, player, id)
-    @allowed_move_deltas = { move_standard: king_deltas,
-                             move_attack: king_deltas }
+    @allowed_actions_deltas = { move_standard: king_deltas,
+                                move_attack: king_deltas }
   end
 
   private

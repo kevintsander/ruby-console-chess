@@ -6,8 +6,8 @@ require './lib/unit'
 class Queen < Unit
   def initialize(location, player, id = location)
     super(location, player, id)
-    @allowed_move_deltas = { move_standard: queen_deltas,
-                             move_attack: queen_deltas }
+    @allowed_actions_deltas = { move_standard: queen_deltas,
+                                move_attack: queen_deltas }
   end
 
   private

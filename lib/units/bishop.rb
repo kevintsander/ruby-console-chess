@@ -6,8 +6,8 @@ require './lib/unit'
 class Bishop < Unit
   def initialize(location, player, id = location)
     super(location, player, id)
-    @allowed_move_deltas = { move_standard: bishop_deltas,
-                             move_attack: bishop_deltas }
+    @allowed_actions_deltas = { move_standard: bishop_deltas,
+                                move_attack: bishop_deltas }
   end
 
   private

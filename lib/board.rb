@@ -44,8 +44,8 @@ class Board
     false
   end
 
-  def allowed_moves(unit)
-    unit.allowed_move_deltas.each_with_object({}) do |(action, deltas), new_hash|
+  def allowed_actions(unit)
+    unit.allowed_actions_deltas.each_with_object({}) do |(action, deltas), new_hash|
       locations = allowed_action_locations(unit, action, deltas)
       new_hash[action] = locations if locations&.any?
       new_hash

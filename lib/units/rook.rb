@@ -6,8 +6,8 @@ require './lib/unit'
 class Rook < Unit
   def initialize(location, player, id = location)
     super(location, player, id)
-    @allowed_move_deltas = { move_standard: rook_deltas,
-                             move_attack: rook_deltas }
+    @allowed_actions_deltas = { move_standard: rook_deltas,
+                                move_attack: rook_deltas }
   end
 
   private
