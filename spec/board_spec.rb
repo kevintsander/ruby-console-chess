@@ -179,8 +179,57 @@ describe Board do
       end
     end
 
-    context 'friendly units are blocking moves' do
-      xit 'returns all moves that are not out of bounds or blocked by friendly units' do
+    context 'units are blocking moves' do
+      it 'returns all moves that are not blocked by units' do
+        blocking_pawn = Pawn.new('e4', black_player)
+        bishop_unit = Bishop.new('c6', white_player)
+        rook_unit = Rook.new('e6', white_player)
+        queen_unit = Queen.new('g4', white_player)
+
+        allow(board_allowed).to receive(:units).and_return([blocking_pawn, bishop_unit, rook_unit, queen_unit])
+
+        bishop_result = board_allowed.allowed_actions(bishop_unit)
+        rook_result = board_allowed.allowed_actions(rook_unit)
+        queen_result = board_allowed.allowed_actions(queen_unit)
+
+        expect(bishop_result[:move_standard].sort).to eq(%w[b7 a8 b5 a4 d5 d7 e8].sort)
+        expect(rook_result[:move_standard].sort).to eq(%w[e7 e8 d6 e5 f6 g6 h6].sort)
+        expect(queen_result[:move_standard].sort).to eq(%w[h4 h5 h3 g5 g6 g7 g8 g3 g2 g1 e2 d1 f3 f4 f5].sort)
+      end
+    end
+
+    context 'unblocked enemies in move range' do
+      it 'allows attack' do
+        queen = Queen.new('f6', black_player)
+        enemy_queen = Queen.new('f1', white_player)
+        enemy_knight = Knight.new('d5', white_player)
+        enemy_pawn = Pawn.new('d4', white_player)
+        enemy_bishop = Bishop.new('f8', white_player)
+
+        allow(board_allowed).to receive(:units).and_return([queen, enemy_queen, enemy_knight, enemy_pawn, enemy_bishop])
+
+        queen_result = board_allowed.allowed_actions(queen)
+        enemy_knight_result = board_allowed.allowed_actions(enemy_knight)
+
+        expect(queen_result[:move_attack].sort).to eq(%w[f1 f8 d4].sort)
+        expect(enemy_knight_result[:jump_attack]).to eq(%w[f6])
+      end
+    end
+
+    context 'blocked enemies in move range' do
+      it 'do not allow attack' do
+        white_rook = Rook.new('a1', white_player)
+        white_pawn = Pawn.new('a2', white_player)
+        black_rook = Rook.new('a6', black_player)
+        black_bishop = Bishop.new('c1', black_player)
+
+        allow(board_allowed).to receive(:units).and_return([white_rook, white_pawn, black_rook, black_bishop])
+
+        white_rook_result = board_allowed.allowed_actions(white_rook)
+        black_rook_result = board_allowed.allowed_actions(black_rook)
+
+        expect(white_rook_result[:move_attack]).to eq(%w[c1])
+        expect(black_rook_result[:move_attack]).to eq(%w[a2])
       end
     end
   end
