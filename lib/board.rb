@@ -21,15 +21,20 @@ class Board
     create_units
   end
 
-  def unit(location)
+  def unit_at(location)
     units.select { |unit| unit.location == location }&.first
+  end
+
+  def enemy_unit_at(player, location)
+    unit = unit_at(location)
+    unit if unit && unit.player != player
   end
 
   def unit_blocking_move?(unit, to_location)
     check_location = unit.location
     until check_location == to_location
       check_location = step_location(check_location, to_location)
-      unit_at_location = unit(check_location)
+      unit_at_location = unit_at(check_location)
 
       # blocking if a unit found in the path, unless it is an unfriendly unit on the final space
       return true if unit_at_location && (unit_at_location.player == unit.player || check_location != to_location)
@@ -50,18 +55,17 @@ class Board
       deltas.each do |delta|
         unit_coordinates = location_coordinates(unit.location)
         location = coordinates_location(move_coordinates(unit_coordinates, delta))
-        unit_at_location = unit(location)
         break unless location
 
         case action
         when :move_standard
-          break if unit_blocking_move?(unit, location)
+          break unless can_move_standard?(unit, location)
         when :move_attack
-          break unless unit_at_location && unit_at_location.player != unit.player && unit_blocking_move?(unit, location)
+          break unless can_move_attack?(unit, location)
         when :jump_standard
-          break if unit_at_location
+          break unless can_jump_standard?(unit, location)
         when :jump_attack
-          break unless unit_at_location && unit_at_location.player != unit.player
+          break unless can_jump_attack?(unit, location)
         when :en_passant
           break
         when :kingside_castle
@@ -77,7 +81,21 @@ class Board
     end
   end
 
-  def filter_moves; end
+  def can_move_standard?(unit, move_location)
+    !enemy_unit_at(unit.player, move_location) && !unit_blocking_move?(unit, move_location)
+  end
+
+  def can_move_attack?(unit, move_location)
+    enemy_unit_at(unit.player, move_location) && !unit_blocking_move?(unit, move_location)
+  end
+
+  def can_jump_standard?(unit, move_location)
+    !unit_at(unit.player, move_location)
+  end
+
+  def can_jump_attack?(unit, move_location)
+    enemy_unit_at(unit.player, move_location) ? true : false
+  end
 
   def create_units
     @units ||= []

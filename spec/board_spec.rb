@@ -38,14 +38,14 @@ describe Board do
 
     context 'a unit is at the location' do
       it 'return true' do
-        result = board.unit('g3')
+        result = board.unit_at('g3')
         expect(result).to be(unit)
       end
     end
 
     context 'a unit is not at the location' do
       it 'return true' do
-        result = board.unit('c2')
+        result = board.unit_at('c2')
         expect(result).to be_nil
       end
     end
