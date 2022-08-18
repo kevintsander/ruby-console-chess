@@ -136,6 +136,10 @@ describe Board do
   describe '#allowed_actions' do
     subject(:board_allowed) { described_class.new([white_player, black_player], game_log) }
 
+    before do
+      allow(game_log).to receive(:unit_actions)
+    end
+
     context 'moves inside boundary' do
       it 'returns all moves' do
         pawn_unit = Pawn.new('c3', white_player)
@@ -236,8 +240,12 @@ describe Board do
 
     context 'enemy pawn just moved two spaces' do
       let(:enemy_pawn_jumped_two) { Pawn.new('d4', white_player) }
-      let(:log_en_passant) { double('move_log', last_move: { unit: enemy_pawn_jumped_two, last_location: 'd2' }) }
+      let(:log_en_passant) { double('log_en_passant', last_move: { unit: enemy_pawn_jumped_two, last_location: 'd2' }) }
       subject(:board_en_passant) { described_class.new([white_player, black_player], log_en_passant) }
+
+      before do
+        allow(log_en_passant).to receive(:unit_actions)
+      end
 
       it 'adjacent pawn can en passant' do
         adjacent_pawn = Pawn.new('e4', black_player)
@@ -249,6 +257,22 @@ describe Board do
         non_adjacent_pawn = Pawn.new('f4', black_player)
         non_adjacent_pawn_result = board_en_passant.allowed_actions(non_adjacent_pawn)
         expect(non_adjacent_pawn_result[:en_passant]).to eq(nil)
+      end
+    end
+
+    context 'pawn has not moved' do
+      let(:log_en_passant) { double('move_log', last_move: { unit: enemy_pawn_jumped_two, last_location: 'd2' }) }
+      xit 'allowed to double move' do
+      end
+    end
+
+    context 'pawn has moved' do
+      xit 'not allowed to double move' do
+      end
+    end
+
+    context 'pawn has not moved, but is blocked by another unit' do
+      xit 'not allowed to double move' do
       end
     end
   end
