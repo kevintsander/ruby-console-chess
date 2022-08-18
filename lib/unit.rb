@@ -34,6 +34,10 @@ class Unit
     other_unit && player != other_unit.player
   end
 
+  def friendly?(other_unit)
+    other_unit && self != other_unit && player == other_unit.player
+  end
+
   def kingside_start?
     %w[a b c d].include?(@initial_location[0])
   end

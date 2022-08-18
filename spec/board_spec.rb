@@ -295,4 +295,27 @@ describe Board do
       end
     end
   end
+
+  describe '#check?' do
+    let(:king) { King.new('b2', white_player) }
+    subject(:board_check) { described_class.new([white_player, black_player], game_log) }
+
+    context 'king unit is in check' do
+      xit 'returns true' do
+        enemy_bishop = Bishop.new('f6', black_player)
+        allow(board_check).to receive(:units).and_return([king, enemy_bishop])
+        result = board_check.check?(king)
+        expect(result).to be_true
+      end
+    end
+
+    context 'king unit is not in check' do
+      xit 'returns false' do
+        enemy_bishop = Bishop.new('e6', black_player)
+        allow(board_check).to receive(:units).and_return([king, enemy_bishop])
+        result = board_check.check?(king)
+        expect(result).not_to be_true
+      end
+    end
+  end
 end

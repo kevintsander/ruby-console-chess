@@ -48,9 +48,23 @@ class Board
     end
   end
 
-  def friendly_units(player)
-    units.each do |unit|
-      yield(unit) if player == unit.player
+  def friendly_units(unit)
+    if block_given?
+      units.each do |other|
+        yield(other) if unit.friendly?(other)
+      end
+    else
+      units.select { |other| unit.friendly?(other) }
+    end
+  end
+
+  def enemy_units(unit)
+    if block_given?
+      units.each do |other|
+        yield(other) if unit.enemy?(other)
+      end
+    else
+      units.select { |other| unit.enemy?(other) }
     end
   end
 
