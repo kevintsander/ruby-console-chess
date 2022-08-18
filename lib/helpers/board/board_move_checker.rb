@@ -39,7 +39,7 @@ module BoardMoveChecker
     end
   end
 
-  def can_move_double?(unit, move_location)
+  def can_move_initial_double?(unit, move_location)
     unit.is_a?(Pawn) &&
       !@game_log.unit_actions(unit) &&
       !unit_blocking_move?(unit, move_location) &&
@@ -136,7 +136,7 @@ module BoardMoveChecker
     when :move_standard
       can_move_standard?(unit, move_location)
     when :initial_double
-      can_move_double?(unit, move_location)
+      can_move_initial_double?(unit, move_location)
     when :move_attack
       can_move_attack?(unit, move_location)
     when :jump_standard
