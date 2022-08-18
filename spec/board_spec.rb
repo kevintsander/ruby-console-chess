@@ -111,26 +111,6 @@ describe Board do
         expect(board_block).to be_unit_blocking_move(move_unit, 'h8')
       end
     end
-
-    context 'friendly unit on move space' do
-      let(:move_unit) { double('unit', location: 'b2', player: white_player) }
-      let(:friendly_unit) { double('unit', location: 'd4', player: white_player) }
-
-      it 'returns true' do
-        allow(board_block).to receive(:units).and_return([move_unit, friendly_unit])
-        expect(board_block).to be_unit_blocking_move(move_unit, 'd4')
-      end
-    end
-
-    context 'unfriendly unit on move space' do
-      let(:move_unit) { double('unit', location: 'b2', player: white_player) }
-      let(:unfriendly_unit) { double('unit', location: 'd4', player: black_player) }
-
-      it 'returnwhs false' do
-        allow(board_block).to receive(:units).and_return([move_unit, unfriendly_unit])
-        expect(board_block).not_to be_unit_blocking_move(move_unit, 'd4')
-      end
-    end
   end
 
   describe '#allowed_actions' do
@@ -261,13 +241,35 @@ describe Board do
     end
 
     context 'pawn has not moved' do
-      let(:log_en_passant) { double('move_log', last_move: { unit: enemy_pawn_jumped_two, last_location: 'd2' }) }
-      xit 'allowed to double move' do
+      let(:new_pawn) { Pawn.new('h7', black_player) }
+      let(:log_double) { double('game_log', last_move: nil) }
+      subject(:board_double) { described_class.new([white_player, black_player], log_double) }
+
+      before do
+        allow(board_double).to receive(:units).and_return([new_pawn])
+        allow(log_double).to receive(:unit_actions).and_return(nil)
+      end
+
+      it 'allowed to double move' do
+        result = board_double.allowed_actions(new_pawn)
+        expect(result[:initial_double]).to eq(['h5'])
       end
     end
 
     context 'pawn has moved' do
-      xit 'not allowed to double move' do
+      let(:moved_pawn) { Pawn.new('h6', black_player) }
+      let(:log_double) { double('game_log', last_move: nil) }
+      subject(:board_double) { described_class.new([white_player, black_player], log_double) }
+
+      before do
+        allow(board_double).to receive(:units).and_return([moved_pawn])
+        allow(log_double).to receive(:unit_actions).with(moved_pawn).and_return({ action: :move_standard,
+                                                                                  last_location: 'h7' })
+      end
+
+      it 'not allowed to double move' do
+        result = board_double.allowed_actions(moved_pawn)
+        expect(result[:initial_double]).to eq(nil)
       end
     end
 

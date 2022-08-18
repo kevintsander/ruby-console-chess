@@ -40,14 +40,17 @@ module BoardMoveChecker
   end
 
   def can_move_double?(unit, move_location)
-    unit.is_a?(Pawn) && !@game_log.unit_actions(unit) && !unit_blocking_move?(unit, move_location)
+    unit.is_a?(Pawn) &&
+      !@game_log.unit_actions(unit) &&
+      !unit_blocking_move?(unit, move_location) &&
+      !unit.enemy?(unit_at(move_location))
   end
 
   def can_perform_action?(unit, move_location, action)
     case action
     when :move_standard
       can_move_standard?(unit, move_location)
-    when :move_double
+    when :initial_double
       can_move_double?(unit, move_location)
     when :move_attack
       can_move_attack?(unit, move_location)
