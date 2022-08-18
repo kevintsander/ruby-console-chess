@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require './lib/location_rank_and_file'
-require './lib/board_location_mapper'
-require './lib/board_move_checker'
+require './lib/helpers/location_rank_and_file'
+require './lib/helpers/board/board_location_mapper'
+require './lib/helpers/board/board_move_checker'
 require './lib/units/king'
 require './lib/units/queen'
 require './lib/units/bishop'
