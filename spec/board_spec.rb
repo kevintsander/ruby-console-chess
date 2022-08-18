@@ -5,7 +5,7 @@ require './lib/board'
 describe Board do
   let(:white_player) { double('white_player', color: :white) }
   let(:black_player) { double('black_player', color: :black) }
-  let(:game_log) { double('game_log') }
+  let(:game_log) { double('game_log', last_move: nil) }
 
   describe '#initialize' do
     it 'creates all chess game pieces' do
@@ -235,15 +235,20 @@ describe Board do
     end
 
     context 'enemy pawn just moved two spaces' do
-      let(:adjacent_pawn) { double('pawn', player: black_player, location: 'e4') }
-      let(:enemy_pawn_jumped_two) { double('pawn', player: white_player, location: 'd4') }
-      let(:log) { double('move_log', last_move: { unit: enemy_pawn_jumped_two, last_location: 'd2' }) }
-      xit 'adjacent pawn can en passant' do
-        adjacent_pawn_result = board_allowed.allowed_actions(adjacent_pawn)
-        expect(adjacent_pawn_result[:en_passant]).to be(['d3'])
+      let(:enemy_pawn_jumped_two) { Pawn.new('d4', white_player) }
+      let(:log_en_passant) { double('move_log', last_move: { unit: enemy_pawn_jumped_two, last_location: 'd2' }) }
+      subject(:board_en_passant) { described_class.new([white_player, black_player], log_en_passant) }
+
+      it 'adjacent pawn can en passant' do
+        adjacent_pawn = Pawn.new('e4', black_player)
+        adjacent_pawn_result = board_en_passant.allowed_actions(adjacent_pawn)
+        expect(adjacent_pawn_result[:en_passant]).to eq(['d3'])
       end
 
-      xit 'non-adjacent pawn cannot en passant' do
+      it 'non-adjacent pawn cannot en passant' do
+        non_adjacent_pawn = Pawn.new('f4', black_player)
+        non_adjacent_pawn_result = board_en_passant.allowed_actions(non_adjacent_pawn)
+        expect(non_adjacent_pawn_result[:en_passant]).to eq(nil)
       end
     end
   end

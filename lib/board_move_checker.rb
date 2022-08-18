@@ -18,8 +18,25 @@ module BoardMoveChecker
     unit.enemy?(unit_at(move_location))
   end
 
-  def can_en_passant?(unit, _move_location)
-    return unless unit.is_a?(Pawn)
+  def can_en_passant?(unit, move_location)
+    return false unless unit.is_a?(Pawn)
+
+    last_move = @game_log.last_move
+    return false unless last_move
+
+    last_unit = last_move[:unit]
+    last_unit_location = last_unit.location
+    units_delta = location_delta(unit.location, last_unit_location)
+    last_move_delta = location_delta(last_move[:last_location], last_unit_location)
+    # if last move was a pawn that moved two ranks, and it is in adjacent column, can jump behind other pawn (en passant)
+    if last_unit.is_a?(Pawn) &&
+       units_delta[1].abs == 1 &&
+       last_move_delta[0].abs == 2 &&
+       file(move_location) == file(last_unit_location)
+      true
+    else
+      false
+    end
   end
 
   def can_perform_action?(unit, move_location, action)
@@ -33,7 +50,7 @@ module BoardMoveChecker
     when :jump_attack
       can_jump_attack?(unit, move_location)
     when :en_passant
-      false
+      can_en_passant?(unit, move_location)
     when :kingside_castle
       false
     when :queenside_castle
