@@ -8,14 +8,14 @@ class Unit
   include UnitSymbolMapper
   include LocationRankAndFile
 
-  attr_reader :location, :player, :id, :symbol, :allowed_actions_deltas, :initial_rank
+  attr_reader :location, :player, :id, :symbol, :allowed_actions_deltas
 
   def initialize(location, player, id = location)
     @location = location
     @player = player
     @id = id
     @symbol = get_color_symbol(player.color)
-    @initial_rank = rank(location)
+    @initial_location = location
   end
 
   def captured?
@@ -32,6 +32,14 @@ class Unit
 
   def enemy?(other_unit)
     other_unit && player != other_unit.player
+  end
+
+  def kingside_start?
+    %w[a b c d].include?(@initial_location[0])
+  end
+
+  def queenside_start?
+    %w[e f g h].include?(@initial_location[0])
   end
 
   # Gets forward location based on initial location, to be used by constructor
