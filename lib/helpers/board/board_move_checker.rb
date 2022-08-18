@@ -79,9 +79,19 @@ module BoardMoveChecker
     false
   end
 
-  def enemy_can_attack_location?(unit, move_location)
+  def enemy_can_attack_location?(unit, location)
     enemy_units(unit) do |enemy|
-      return true if allowed_locations(enemy).include?(move_location)
+      enemy_location = enemy.location
+      jump_actions = enemy.allowed_actions_deltas[:jump_standard]
+      jump_actions && jump_actions.each do |jump_delta|
+        jump_location = delta_location(enemy_location, jump_delta)
+        return true if jump_location == location
+      end
+      move_actions = enemy.allowed_actions_deltas[:move_standard]
+      move_actions && move_actions.each do |move_delta|
+        move_location = delta_location(enemy_location, move_delta)
+        return true if move_location == location && !unit_blocking_move?(enemy, move_location)
+      end
     end
     false
   end
@@ -120,7 +130,8 @@ module BoardMoveChecker
   end
 
   def get_unit_castle_action_location(unit, castle_action)
-    delta_location(unit.location, unit.allowed_actions_deltas[castle_action].first)
+    allowed_deltas = unit.allowed_actions_deltas[castle_action].first
+    delta_location(unit.location, allowed_deltas)
   end
 
   def get_friendly_king(unit)

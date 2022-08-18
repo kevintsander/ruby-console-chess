@@ -294,6 +294,68 @@ describe Board do
         expect(enemy_on_space_result[:initial_double]).to eq(nil)
       end
     end
+
+    context 'king and rook have not moved and no units blocking path' do
+      subject(:board_castle) { described_class.new([white_player, black_player], game_log) }
+      let(:white_queenside_rook) { Rook.new('a1', white_player) }
+      let(:black_queenside_rook) { Rook.new('a8', black_player) }
+      let(:white_kingside_rook) { Rook.new('h1', white_player) }
+      let(:black_kingside_rook) { Rook.new('h8', black_player) }
+      let(:white_king) { King.new('e1', white_player) }
+      let(:black_king) { King.new('e8', black_player) }
+
+      before do
+        allow(game_log).to receive(:unit_actions)
+        allow(board_castle).to receive(:units).and_return([white_queenside_rook, white_kingside_rook, white_king,
+                                                           black_queenside_rook, black_kingside_rook, black_king])
+      end
+
+      it 'can castle' do
+        white_king_result = board_castle.allowed_actions(white_king)
+        white_queenside_rook_result = board_castle.allowed_actions(white_queenside_rook)
+        white_kingside_rook_result = board_castle.allowed_actions(white_kingside_rook)
+        black_king_reuslt = board_castle.allowed_actions(black_king)
+        black_queenside_king_result = board_castle.allowed_actions(black_queenside_rook)
+        black_kingside_rook_result = board_castle.allowed_actions(black_kingside_rook)
+
+        expect(white_king_result[:queenside_castle]).to eq(['c1'])
+      end
+    end
+
+    context 'king and rook have not moved but units blocking path' do
+      xit 'cannot castle' do
+      end
+    end
+
+    context 'king and rook have not moved but king move spaces are under attack' do
+      subject(:board_castle) { described_class.new([white_player, black_player], game_log) }
+      let(:white_queenside_rook) { Rook.new('a1', white_player) }
+      let(:white_kingside_rook) { Rook.new('h1', white_player) }
+      let(:white_king) { King.new('e1', white_player) }
+      let(:black_rook) { Rook.new('f8', black_player) }
+      let(:black_knight) { Knight.new('e3', black_player) }
+      before do
+        allow(game_log).to receive(:unit_actions)
+        allow(board_castle).to receive(:units).and_return([white_queenside_rook, white_kingside_rook, white_king,
+                                                           black_rook, black_knight])
+      end
+
+      it 'cannot castle' do
+        queenside_rook_result = board_castle.allowed_actions(white_queenside_rook)
+        kingside_rook_result = board_castle.allowed_actions(white_kingside_rook)
+        king_result = board_castle.allowed_actions(white_king)
+
+        expect(queenside_rook_result[:queenside_castle]).to eq(nil)
+        expect(kingside_rook_result[:kingside_castle]).to eq(nil)
+        expect(king_result[:kingside_castle]).to eq(nil)
+        expect(king_result[:queenside_castle]).to eq(nil)
+      end
+    end
+
+    context 'king or rook have moved' do
+      xit 'cannot castle' do
+      end
+    end
   end
 
   describe '#check?' do

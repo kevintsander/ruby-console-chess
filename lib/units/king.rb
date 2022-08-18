@@ -21,10 +21,10 @@ class King < Unit
   end
 
   def kingside_castle_delta
-    [0, 2]
+    [[0, 2]]
   end
 
   def queenside_castle_delta
-    [0, -2]
+    [[0, -2]]
   end
 end
