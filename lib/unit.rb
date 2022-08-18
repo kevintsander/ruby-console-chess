@@ -38,11 +38,11 @@ class Unit
     other_unit && self != other_unit && player == other_unit.player
   end
 
-  def kingside_start?
+  def queenside_start?
     %w[a b c d].include?(@initial_location[0])
   end
 
-  def queenside_start?
+  def kingside_start?
     %w[e f g h].include?(@initial_location[0])
   end
 
