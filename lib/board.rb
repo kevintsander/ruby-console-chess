@@ -48,6 +48,12 @@ class Board
     end
   end
 
+  def friendly_units(player)
+    units.each do |unit|
+      yield(unit) if player == unit.player
+    end
+  end
+
   private
 
   def allowed_action_locations(unit, action, deltas)
