@@ -3,6 +3,7 @@
 require './lib/helpers/location_rank_and_file'
 require './lib/helpers/board/board_location_mapper'
 require './lib/helpers/board/board_move_checker'
+require './lib/helpers/board/board_status_checker'
 require './lib/units/king'
 require './lib/units/queen'
 require './lib/units/bishop'
@@ -15,6 +16,7 @@ class Board
   include LocationRankAndFile
   include BoardLocationMapper
   include BoardMoveChecker
+  include BoardStatusChecker
 
   attr_reader :players, :units
 
@@ -42,9 +44,15 @@ class Board
 
   def allowed_actions(unit)
     unit.allowed_actions_deltas.each_with_object({}) do |(action, deltas), new_hash|
-      locations = allowed_action_locations(unit, action, deltas)
+      locations = allowed_action_delta_locations(unit, action, deltas)
       new_hash[action] = locations if locations&.any?
       new_hash
+    end
+  end
+
+  def allowed_locations(unit)
+    allowed_actions(unit).reduce([]) do |locations, (_action, action_locations)|
+      locations + action_locations
     end
   end
 
@@ -70,7 +78,7 @@ class Board
 
   private
 
-  def allowed_action_locations(unit, action, deltas)
+  def allowed_action_delta_locations(unit, action, deltas)
     deltas.reduce([]) do |locations, delta|
       location = delta_location(unit.location, delta)
       next locations unless location # out of bounds?
