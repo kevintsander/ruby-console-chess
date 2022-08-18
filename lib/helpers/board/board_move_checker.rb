@@ -46,6 +46,91 @@ module BoardMoveChecker
       !unit.enemy?(unit_at(move_location))
   end
 
+  def king_can_kingside_castle?(unit, move_location)
+    return false unless unit.is_a(King)
+    return false if check?(unit)
+    return false if @game_log.unit_actions(unit)
+
+    rook = friendly_units(unit).select { |friendly| friendly.is_a(Rook) && friendly.kingside_start? }
+    return false unless rook_can_kingside_castle?(rook)
+
+    return false if unit_blocking_move?(unit, move_location, rook)
+    return false if enemy_can_attack_move?(unit, move_location)
+    return false if unit.enemy?(unit_at(move_location))
+
+    true
+  end
+
+  def king_can_queenside_castle?(unit, move_location)
+    return false unless unit.is_a(King)
+    return false if check?(unit)
+    return false if @game_log.unit_actions(unit)
+
+    rook = friendly_units(unit).select { |friendly| friendly.is_a(Rook) && friendly.queenside_start? }
+    return false unless rook_can_queenside_castle?(rook)
+
+    return false if unit_blocking_move?(unit, move_location, rook)
+    return false if enemy_can_attack_move?(unit, move_location)
+    return false if unit.enemy?(unit_at(move_location))
+
+    true
+  end
+
+  def rook_can_kingside_castle?(unit, move_location)
+    return false unless unit.is_a(Rook) && unit.kingside_start?
+    return false if @game_log.unit_actions(unit)
+
+    rook = friendly_units(unit).select { |friendly| friendly.is_a(King) }
+    return false unless king_can_kingside_castle?(king)
+
+    return false if unit_blocking_move?(unit, move_location, rook)
+    return false if unit.enemy?(unit_at(move_location))
+
+    true
+  end
+
+  def rook_can_queenside_castle?(unit, move_location)
+    return false unless unit.is_a(Rook) && unit.queenside_start?
+    return false if @game_log.unit_actions(unit)
+
+    rook = friendly_units(unit).select { |friendly| friendly.is_a(King) }
+    return false unless king_can_queenside_castle?(king)
+
+    return false if unit_blocking_move?(unit, move_location, rook)
+    return false if unit.enemy?(unit_at(move_location))
+
+    true
+  end
+
+  def can_kingside_castle?(unit, move_location)
+    case unit.class
+    when Rook
+      rook_can_kingside_castle?(unit, move_location)
+    when King
+      king_can_kingside_castle?(unit, move_location)
+    end
+  end
+
+  def can_queenside_castle?(unit, move_location)
+    case unit.class
+    when Rook
+      rook_can_queenside_castle?(unit, move_location)
+      king_can_kingside_castle?(unit, move_location)
+    end
+  end
+
+  def enemy_can_attack_move?(unit, move_location)
+    check_location = unit.location
+    until check_location == move_location
+      check_location = step_location(check_location, move_location)
+
+      enemy_units(unit) do |enemy|
+        return true if allowed_locations(enemy).include?(check_location)
+      end
+    end
+    false
+  end
+
   def can_perform_action?(unit, move_location, action)
     case action
     when :move_standard
@@ -61,9 +146,9 @@ module BoardMoveChecker
     when :en_passant
       can_en_passant?(unit, move_location)
     when :kingside_castle
-      false
+      can_kingside_castle?(unit, move_location)
     when :queenside_castle
-      false
+      can_queenside_castle?(unit, move_location)
     end
   end
 end
