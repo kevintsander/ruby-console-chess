@@ -18,6 +18,10 @@ module BoardMoveChecker
     unit.enemy?(unit_at(move_location))
   end
 
+  def can_en_passant?(unit, _move_location)
+    return unless unit.is_a?(Pawn)
+  end
+
   def can_perform_action?(unit, move_location, action)
     case action
     when :move_standard

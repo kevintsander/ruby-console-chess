@@ -5,10 +5,11 @@ require './lib/board'
 describe Board do
   let(:white_player) { double('white_player', color: :white) }
   let(:black_player) { double('black_player', color: :black) }
+  let(:game_log) { double('game_log') }
 
   describe '#initialize' do
     it 'creates all chess game pieces' do
-      board = described_class.new([white_player, black_player])
+      board = described_class.new([white_player, black_player], game_log)
       [white_player, black_player].each do |player|
         player_units = board.units.select { |unit| unit.player == player }
 
@@ -29,7 +30,7 @@ describe Board do
   end
 
   describe '#unit' do
-    subject(:board) { described_class.new([white_player, black_player]) }
+    subject(:board) { described_class.new([white_player, black_player], game_log) }
     let(:unit) { double('unit', location: 'g3') }
 
     before do
@@ -52,7 +53,7 @@ describe Board do
   end
 
   describe '#unit_blocking_move?' do
-    subject(:board_block) { described_class.new([white_player, black_player]) }
+    subject(:board_block) { described_class.new([white_player, black_player], game_log) }
 
     context 'horizontal move with no other units between' do
       let(:move_unit) { double('unit', location: 'g2', player: white_player) }
@@ -125,7 +126,7 @@ describe Board do
       let(:move_unit) { double('unit', location: 'b2', player: white_player) }
       let(:unfriendly_unit) { double('unit', location: 'd4', player: black_player) }
 
-      it 'returns false' do
+      it 'returnwhs false' do
         allow(board_block).to receive(:units).and_return([move_unit, unfriendly_unit])
         expect(board_block).not_to be_unit_blocking_move(move_unit, 'd4')
       end
@@ -133,7 +134,7 @@ describe Board do
   end
 
   describe '#allowed_actions' do
-    subject(:board_allowed) { described_class.new([white_player, black_player]) }
+    subject(:board_allowed) { described_class.new([white_player, black_player], game_log) }
 
     context 'moves inside boundary' do
       it 'returns all moves' do
@@ -230,6 +231,19 @@ describe Board do
 
         expect(white_rook_result[:move_attack]).to eq(%w[c1])
         expect(black_rook_result[:move_attack]).to eq(%w[a2])
+      end
+    end
+
+    context 'enemy pawn just moved two spaces' do
+      let(:adjacent_pawn) { double('pawn', player: black_player, location: 'e4') }
+      let(:enemy_pawn_jumped_two) { double('pawn', player: white_player, location: 'd4') }
+      let(:log) { double('move_log', last_move: { unit: enemy_pawn_jumped_two, last_location: 'd2' }) }
+      xit 'adjacent pawn can en passant' do
+        adjacent_pawn_result = board_allowed.allowed_actions(adjacent_pawn)
+        expect(adjacent_pawn_result[:en_passant]).to be(['d3'])
+      end
+
+      xit 'non-adjacent pawn cannot en passant' do
       end
     end
   end
