@@ -274,7 +274,24 @@ describe Board do
     end
 
     context 'pawn has not moved, but is blocked by another unit' do
-      xit 'not allowed to double move' do
+      let(:new_pawn) { Pawn.new('h7', black_player) }
+      let(:blocking_friendly) { Knight.new('h6', black_player) }
+      let(:enemy_on_space) { Rook.new('h5', white_player) }
+      let(:log_double) { double('game_log', last_move: nil) }
+      subject(:board_double) { described_class.new([white_player, black_player], log_double) }
+
+      before do
+        allow(log_double).to receive(:unit_actions).and_return(nil)
+      end
+
+      it 'not allowed to double move' do
+        allow(board_double).to receive(:units).and_return([new_pawn, blocking_friendly],
+                                                          [new_pawn, enemy_on_space])
+        blocking_friendly_result = board_double.allowed_actions(new_pawn)
+        enemy_on_space_result = board_double.allowed_actions(new_pawn)
+
+        expect(blocking_friendly_result[:initial_double]).to eq(nil)
+        expect(enemy_on_space_result[:initial_double]).to eq(nil)
       end
     end
   end
