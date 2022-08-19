@@ -334,6 +334,7 @@ describe Board do
       let(:white_king) { King.new('e1', white_player) }
       let(:black_rook) { Rook.new('f8', black_player) }
       let(:black_knight) { Knight.new('e3', black_player) }
+
       before do
         allow(game_log).to receive(:unit_actions)
         allow(board_castle).to receive(:units).and_return([white_queenside_rook, white_kingside_rook, white_king,
@@ -353,7 +354,24 @@ describe Board do
     end
 
     context 'king or rook have moved' do
-      xit 'cannot castle' do
+      subject(:board_castle) { described_class.new([white_player, black_player], game_log) }
+      let(:queenside_rook) { Rook.new('a1', white_player) }
+      let(:kingside_rook) { Rook.new('h1', white_player) }
+      let(:king) { King.new('e1', white_player) }
+
+      before do
+        allow(board_castle).to receive(:units).and_return([queenside_rook, kingside_rook, king])
+        allow(game_log).to receive(:unit_actions).and_return({ action: :move_standard })
+      end
+
+      it 'cannot castle' do
+        queenside_rook_result = board_castle.allowed_actions(queenside_rook)
+        kingside_rook_result = board_castle.allowed_actions(kingside_rook)
+        king_result = board_castle.allowed_actions(king)
+        expect(queenside_rook_result[:queenside_castle]).to eq(nil)
+        expect(kingside_rook_result[:kingside_castle]).to eq(nil)
+        expect(king_result[:queenside_castle]).to eq(nil)
+        expect(king_result[:kingside_castle]).to eq(nil)
       end
     end
   end

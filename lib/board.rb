@@ -51,12 +51,6 @@ class Board
     end
   end
 
-  def allowed_locations(unit)
-    allowed_actions(unit).reduce([]) do |locations, (_action, action_locations)|
-      locations + action_locations
-    end
-  end
-
   def friendly_units(unit)
     if block_given?
       units.each do |other|
@@ -83,7 +77,7 @@ class Board
     deltas.reduce([]) do |locations, delta|
       location = delta_location(unit.location, delta)
       next locations unless location # out of bounds?
-      next locations unless can_perform_action?(unit, location, action)
+      next locations unless valid_action_location?(unit, location, action)
 
       locations << location
     end

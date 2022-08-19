@@ -2,23 +2,27 @@
 
 # Contains methods for checking possible board moves
 module BoardMoveChecker
-  def can_move_standard?(unit, move_location)
+  def enemy_unit_at_location?(_player, location)
+    unit_at(location)&.player != playergits
+  end
+
+  def valid_standard_move_location?(unit, move_location)
     !unit.enemy?(unit_at(move_location)) && !unit_blocking_move?(unit, move_location)
   end
 
-  def can_move_attack?(unit, move_location)
+  def valid_move_attack_location?(unit, move_location)
     unit.enemy?(unit_at(move_location)) && !unit_blocking_move?(unit, move_location)
   end
 
-  def can_jump_standard?(move_location)
+  def valid_jump_move_location?(move_location)
     !unit_at(move_location)
   end
 
-  def can_jump_attack?(unit, move_location)
+  def valid_jump_attack_location?(unit, move_location)
     unit.enemy?(unit_at(move_location))
   end
 
-  def can_en_passant?(unit, move_location)
+  def valid_en_passant_location?(unit, move_location)
     return false unless unit.is_a?(Pawn)
 
     last_move = @game_log.last_move
@@ -39,25 +43,31 @@ module BoardMoveChecker
     end
   end
 
-  def can_move_initial_double?(unit, move_location)
+  def valid_initial_double_move_location?(unit, move_location)
     unit.is_a?(Pawn) &&
       !@game_log.unit_actions(unit) &&
       !unit_blocking_move?(unit, move_location) &&
       !unit.enemy?(unit_at(move_location))
   end
 
-  def can_castle?(unit, action)
+  def valid_castle_location?(unit, move_location, castle_action)
     unit_class = unit.class
     return false unless [Rook, King].include?(unit_class)
 
-    rook = unit if unit_class == Rook
-    king = unit if unit_class == King
-    rook ||= get_castle_rook(king, action)
+    if unit_class == Rook
+      rook = unit
+      rook_move_location = move_location
+    elsif unit_class == King
+      king = unit
+      king_move_location = move_location
+    end
+
+    rook ||= get_castle_rook(king, castle_action)
     king ||= get_friendly_king(rook)
     return unless king && rook
 
-    rook_move_location = get_unit_castle_action_location(rook, action)
-    king_move_location = get_unit_castle_action_location(king, action)
+    rook_move_location ||= get_unit_castle_action_location(rook, castle_action)
+    king_move_location ||= get_unit_castle_action_location(king, castle_action)
     # cannot be blocked or have an enemy on the move space
     return false if rook.enemy?(unit_at(rook_move_location)) || unit_blocking_move?(rook, rook_move_location, king)
     return false if king.enemy?(unit_at(king_move_location)) || unit_blocking_move?(king, king_move_location, rook)
@@ -96,22 +106,22 @@ module BoardMoveChecker
     false
   end
 
-  def can_perform_action?(unit, move_location, action)
+  def valid_action_location?(unit, move_location, action)
     case action
     when :move_standard
-      can_move_standard?(unit, move_location)
+      valid_standard_move_location?(unit, move_location)
     when :initial_double
-      can_move_initial_double?(unit, move_location)
+      valid_initial_double_move_location?(unit, move_location)
     when :move_attack
-      can_move_attack?(unit, move_location)
+      valid_move_attack_location?(unit, move_location)
     when :jump_standard
-      can_jump_standard?(move_location)
+      valid_jump_move_location?(move_location)
     when :jump_attack
-      can_jump_attack?(unit, move_location)
+      valid_jump_attack_location?(unit, move_location)
     when :en_passant
-      can_en_passant?(unit, move_location)
+      valid_en_passant_location?(unit, move_location)
     when :kingside_castle, :queenside_castle
-      can_castle?(unit, action)
+      valid_castle_location?(unit, move_location, action)
     end
   end
 
