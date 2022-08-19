@@ -323,7 +323,28 @@ describe Board do
     end
 
     context 'king and rook have not moved but units blocking path' do
-      xit 'cannot castle' do
+      subject(:board_castle) { described_class.new([white_player, black_player], game_log) }
+      let(:black_queenside_rook) { Rook.new('a8', black_player) }
+      let(:black_kingside_rook) { Rook.new('h8', black_player) }
+      let(:black_king) { King.new('e8', black_player) }
+      let(:white_bishop) { Bishop.new('g8', white_player) }
+      let(:black_queen) { Queen.new('d8', white_player) }
+
+      before do
+        allow(game_log).to receive(:unit_actions)
+        allow(board_castle).to receive(:units).and_return([black_queenside_rook, black_kingside_rook, black_king,
+                                                           white_bishop, black_queen])
+      end
+
+      it 'cannot castle' do
+        black_queenside_rook_result = board_castle.allowed_actions(black_queenside_rook)
+        black_kingside_rook_result = board_castle.allowed_actions(black_kingside_rook)
+        black_king_result = board_castle.allowed_actions(black_king)
+
+        expect(black_queenside_rook_result[:queenside_castle]).to eq(nil)
+        expect(black_kingside_rook_result[:kingside_castle]).to eq(nil)
+        expect(black_king_result[:kingside_castle]).to eq(nil)
+        expect(black_king_result[:queenside_castle]).to eq(nil)
       end
     end
 
