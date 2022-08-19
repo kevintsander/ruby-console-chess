@@ -417,4 +417,25 @@ describe Board do
       end
     end
   end
+
+  describe '#checkmate?' do
+    let(:white_king) { King.new('h1', white_player) }
+    let(:black_rook) { Rook.new('g5', black_player) }
+    subject(:board_checkmate) { described_class.new([white_player, black_player], game_log) }
+
+    context 'king still has possible moves' do
+      it 'returns false' do
+        allow(board_checkmate).to receive(:units).and_return([white_king, black_rook])
+        expect(board_checkmate).not_to be_checkmate(white_king)
+      end
+    end
+
+    context 'king does not have any possible moves' do
+      it 'returns true' do
+        black_knight = Knight.new('f3', black_player)
+        allow(board_checkmate).to receive(:units).and_return([white_king, black_rook, black_knight])
+        expect(board_checkmate).to be_checkmate(white_king)
+      end
+    end
+  end
 end

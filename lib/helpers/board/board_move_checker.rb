@@ -107,6 +107,9 @@ module BoardMoveChecker
   end
 
   def valid_action_location?(unit, move_location, action)
+    # King cannot place self in check
+    return false if unit.is_a?(King) && enemy_can_attack_location?(unit, move_location)
+
     case action
     when :move_standard
       valid_standard_move_location?(unit, move_location)
