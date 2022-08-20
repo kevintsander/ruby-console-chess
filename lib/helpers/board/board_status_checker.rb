@@ -1,17 +1,15 @@
 # frozen_string_literal: true
 
 module BoardStatusChecker
-  def check?(unit)
-    return false unless unit.is_a?(King)
-    return false unless enemy_can_attack_location?(unit, unit.location)
-
-    true
+  def check?(king)
+    king.is_a?(King) && enemy_can_attack_location?(king, king.location)
   end
 
   def checkmate?(king)
-    return false unless king.is_a?(King)
-    return false if allowed_actions(king)&.any?
+    king.is_a?(King) & check?(king) & !allowed_actions(king)&.any?
+  end
 
-    true
+  def stalemate?(king)
+    king.is_a?(King) & !check?(king) & !allowed_actions(king)&.any?
   end
 end

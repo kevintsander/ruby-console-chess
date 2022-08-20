@@ -18,12 +18,21 @@ class Board
   include BoardMoveChecker
   include BoardStatusChecker
 
-  attr_reader :players, :units
+  attr_reader :units
 
-  def initialize(players, game_log)
-    @players = players
+  def initialize(units, game_log)
+    @units = units
     @game_log = game_log
-    create_units
+  end
+
+  def clear_units
+    @units = []
+    self
+  end
+
+  def add_unit(*args)
+    args.each { |unit| @units << unit }
+    self
   end
 
   def unit_at(location)
@@ -80,20 +89,6 @@ class Board
       next locations unless valid_action_location?(unit, location, action)
 
       locations << location
-    end
-  end
-
-  def create_units
-    @units ||= []
-    players.each do |player|
-      non_pawn_rank = player.color == :white ? '1' : '8'
-      pawn_rank = player.color == :white ? '2' : '7'
-      @units << King.new("e#{non_pawn_rank}", player)
-      @units << Queen.new("d#{non_pawn_rank}", player)
-      @units += %w[c f].map { |file| Bishop.new("#{file}#{non_pawn_rank}", player) }
-      @units += %w[b g].map { |file| Knight.new("#{file}#{non_pawn_rank}", player) }
-      @units += %w[a h].map { |file| Rook.new("#{file}#{non_pawn_rank}", player) }
-      @units += %w[a b c d e f g h].map { |file| Pawn.new("#{file}#{pawn_rank}", player) }
     end
   end
 end
