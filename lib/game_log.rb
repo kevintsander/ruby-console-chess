@@ -15,7 +15,7 @@ class GameLog
   end
 
   def last_move
-    @log.last[:move]
+    @log&.last
   end
 
   def unit_actions(unit)
