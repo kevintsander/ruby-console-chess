@@ -29,7 +29,9 @@ class Game
     when :en_passant
       en_passant_unit(player, unit, location)
     when :kingside_castle
+      castle_unit(player, action, unit, location)
     when :queenside_castle
+      castle_unit(player, action, unit, location)
     end
   end
 
@@ -78,6 +80,35 @@ class Game
 
     game_log.log_action(turn, player, :en_passant, unit, location, last_location)
     game_log.log_action(turn, player, :captured, captured_unit, nil, captured_unit_location)
+  end
+
+  def castle_unit(player, castle_action, unit, location)
+    allowed_actions = board.allowed_actions(unit)
+    allowed_castle_locations = allowed_actions[:kingside_castle]
+
+    return unless allowed_castle_locations&.include?(location)
+
+    unit_class = unit.class
+    if unit_class == Rook
+      rook = unit
+      rook_move_location = location
+    elsif unit_class == King
+      king = unit
+      king_move_location = location
+    end
+    rook ||= board.get_castle_rook(king, castle_action)
+    king ||= board.get_friendly_king(rook)
+
+    rook_last_location = rook.location
+    king_last_location = king.location
+    rook_move_location ||= board.get_unit_castle_action_location(rook, castle_action)
+    king_move_location ||= board.get_unit_castle_action_location(king, castle_action)
+
+    rook.move(rook_move_location)
+    king.move(king_move_location)
+
+    game_log.log_action(turn, player, castle_action, rook, rook_move_location, rook_last_location)
+    game_log.log_action(turn, player, castle_action, king, king_move_location, king_last_location)
   end
 
   def new_game_units

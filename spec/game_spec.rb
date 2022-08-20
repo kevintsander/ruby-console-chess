@@ -5,7 +5,16 @@ require './lib/game'
 describe Game do
   let(:white_player) { double('player', color: :white) }
   let(:black_player) { double('player', color: :black) }
+  subject(:blank_log) { double('blank_log', log: []) }
+  subject(:blank_board) { double('board', units: []) }
   subject(:blank_game) { described_class.new([white_player, black_player]) }
+
+  before do
+    blank_game.instance_variable_set(:@board, blank_board)
+    blank_game.instance_variable_set(:@game_log, blank_log)
+    allow(blank_log).to receive(:log_action)
+    allow(blank_log).to receive(:unit_actions)
+  end
 
   describe '#new_game_units' do
     subject(:new_game) { described_class.new([white_player, black_player]) }
@@ -33,12 +42,9 @@ describe Game do
     describe 'unit moves' do
       subject(:move_game) { blank_game }
       let(:move_board) { double('board', units: []) }
-      let(:move_log) { double('game_log', log: []) }
 
       before do
         allow(move_game).to receive(:board).and_return(move_board)
-        allow(move_game).to receive(:game_log).and_return(move_log)
-        allow(move_log).to receive(:log_action)
       end
 
       describe '#move_unit' do
@@ -59,7 +65,7 @@ describe Game do
         end
 
         it 'sends move to log' do
-          expect(move_log).to receive(:log_action).once
+          expect(blank_log).to receive(:log_action).once
           move_game.move_unit(white_player, unit, 'g4')
         end
       end
@@ -84,8 +90,8 @@ describe Game do
         end
 
         it 'sends moved unit and captured unit to log' do
-          expect(move_log).to receive(:log_action).with(move_game.turn, white_player, :attack, king, 'g4', 'f5')
-          expect(move_log).to receive(:log_action).with(move_game.turn, white_player, :captured, pawn, nil, 'g4')
+          expect(blank_log).to receive(:log_action).with(move_game.turn, white_player, :attack, king, 'g4', 'f5')
+          expect(blank_log).to receive(:log_action).with(move_game.turn, white_player, :captured, pawn, nil, 'g4')
           move_game.attack_unit(white_player, king, 'g4')
         end
       end
@@ -110,27 +116,50 @@ describe Game do
         end
 
         it 'sends move unit and captured unit to log' do
-          expect(move_log).to receive(:log_action).with(move_game.turn, black_player, :en_passant, black_pawn, 'c3',
-                                                        'd4')
-          expect(move_log).to receive(:log_action).with(move_game.turn,
-                                                        black_player, :captured, white_pawn, nil, 'c4')
+          expect(blank_log).to receive(:log_action).with(move_game.turn, black_player, :en_passant, black_pawn, 'c3',
+                                                         'd4')
+          expect(blank_log).to receive(:log_action).with(move_game.turn,
+                                                         black_player, :captured, white_pawn, nil, 'c4')
           move_game.en_passant_unit(black_player, black_pawn, 'c3')
         end
       end
 
-      describe '#kingside_castle' do
-        xit 'castles the kingside rook and king' do
+      describe '#castle_unit' do
+        let(:castle_board) { Board.new(blank_log) }
+        let(:kingside_rook) { Rook.new('h1', white_player) }
+        let(:queenside_rook) { Rook.new('a1', white_player) }
+        let(:king) { King.new('e1', white_player) }
+
+        before do
+          castle_board.add_unit(kingside_rook, queenside_rook, king)
+          allow(move_game).to receive(:board).and_return(castle_board)
+          allow(kingside_rook).to receive(:move)
+          allow(king).to receive(:capture)
         end
 
-        xit 'sends both moved units to log' do
+        context 'kingside castling from the king' do
+          it 'castles the kingside rook and king' do
+            expect(kingside_rook).to receive(:move).with('f1')
+            expect(king).to receive(:move).with('g1')
+            move_game.castle_unit(white_player, :kingside_castle, king, 'g1')
+          end
         end
-      end
 
-      describe '#queenside_castle' do
-        xit 'castles the queenside rook and king' do
+        context 'kingside castling from the rook' do
+          it 'castles the kingside rook and king' do
+            expect(king).to receive(:move).with('g1')
+            expect(kingside_rook).to receive(:move).with('f1')
+            move_game.castle_unit(white_player, :kingside_castle, kingside_rook, 'f1')
+          end
         end
 
-        xit 'sends both moved units to log'
+        it 'sends both moved units to log' do
+          expect(blank_log).to receive(:log_action).with(move_game.turn, white_player, :kingside_castle, kingside_rook, 'f1',
+                                                         'h1')
+          expect(blank_log).to receive(:log_action).with(move_game.turn, white_player, :kingside_castle, king, 'g1',
+                                                         'e1')
+          move_game.castle_unit(white_player, :kingside_castle, king, 'g1')
+        end
       end
     end
   end
@@ -167,7 +196,7 @@ describe Game do
     end
 
     context 'king is not in check, but any move will put it in check' do
-      xit 'king is not in check but any move will put it in check' do
+      it 'king is not in check but any move will put it in check' do
         black_knight = Knight.new('c6', black_player)
         game_stalemate.board.add_unit(black_knight)
         expect(game_stalemate).to be_stalemate(white_king)

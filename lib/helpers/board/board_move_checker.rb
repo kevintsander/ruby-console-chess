@@ -128,8 +128,6 @@ module BoardMoveChecker
     end
   end
 
-  private
-
   def get_castle_rook(king, castle_action)
     friendly_units(king).select do |friendly|
       friendly.is_a?(Rook) &&
