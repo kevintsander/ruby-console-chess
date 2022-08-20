@@ -20,8 +20,8 @@ class Board
 
   attr_reader :units
 
-  def initialize(units, game_log)
-    @units = units
+  def initialize(game_log)
+    clear_units
     @game_log = game_log
   end
 

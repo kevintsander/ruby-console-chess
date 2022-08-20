@@ -8,7 +8,7 @@ describe Board do
   let(:game_log) { double('game_log', last_move: nil) }
 
   describe '#unit_at' do
-    subject(:board) { described_class.new([], game_log) }
+    subject(:board) { described_class.new(game_log) }
     let(:unit) { double('unit', location: 'g3') }
 
     before do
@@ -31,7 +31,7 @@ describe Board do
   end
 
   describe '#unit_blocking_move?' do
-    subject(:board_block) { described_class.new([], game_log) }
+    subject(:board_block) { described_class.new(game_log) }
 
     context 'horizontal move with no other units between' do
       let(:move_unit) { double('unit', location: 'g2', player: white_player) }
@@ -89,7 +89,7 @@ describe Board do
   end
 
   describe '#allowed_actions' do
-    subject(:board_allowed) { described_class.new([], game_log) }
+    subject(:board_allowed) { described_class.new(game_log) }
 
     before do
       allow(game_log).to receive(:unit_actions)
@@ -196,7 +196,7 @@ describe Board do
     context 'enemy pawn just moved two spaces' do
       let(:enemy_pawn_jumped_two) { Pawn.new('d4', white_player) }
       let(:log_en_passant) { double('log_en_passant', last_move: { unit: enemy_pawn_jumped_two, last_location: 'd2' }) }
-      subject(:board_en_passant) { described_class.new([], log_en_passant) }
+      subject(:board_en_passant) { described_class.new(log_en_passant) }
 
       before do
         allow(log_en_passant).to receive(:unit_actions)
@@ -218,7 +218,7 @@ describe Board do
     context 'pawn has not moved' do
       let(:new_pawn) { Pawn.new('h7', black_player) }
       let(:log_double) { double('game_log', last_move: nil) }
-      subject(:board_double) { described_class.new([], log_double) }
+      subject(:board_double) { described_class.new(log_double) }
 
       before do
         allow(board_double).to receive(:units).and_return([new_pawn])
@@ -234,7 +234,7 @@ describe Board do
     context 'pawn has moved' do
       let(:moved_pawn) { Pawn.new('h6', black_player) }
       let(:log_double) { double('game_log', last_move: nil) }
-      subject(:board_double) { described_class.new([], log_double) }
+      subject(:board_double) { described_class.new(log_double) }
 
       before do
         allow(board_double).to receive(:units).and_return([moved_pawn])
@@ -253,7 +253,7 @@ describe Board do
       let(:blocking_friendly) { Knight.new('h6', black_player) }
       let(:enemy_on_space) { Rook.new('h5', white_player) }
       let(:log_double) { double('game_log', last_move: nil) }
-      subject(:board_double) { described_class.new([], log_double) }
+      subject(:board_double) { described_class.new(log_double) }
 
       before do
         allow(log_double).to receive(:unit_actions).and_return(nil)
@@ -271,7 +271,7 @@ describe Board do
     end
 
     context 'king and rook have not moved and no units blocking path' do
-      subject(:board_castle) { described_class.new([], game_log) }
+      subject(:board_castle) { described_class.new(game_log) }
       let(:white_queenside_rook) { Rook.new('a1', white_player) }
       let(:black_queenside_rook) { Rook.new('a8', black_player) }
       let(:white_kingside_rook) { Rook.new('h1', white_player) }
@@ -298,7 +298,7 @@ describe Board do
     end
 
     context 'king and rook have not moved but units blocking path' do
-      subject(:board_castle) { described_class.new([], game_log) }
+      subject(:board_castle) { described_class.new(game_log) }
       let(:black_queenside_rook) { Rook.new('a8', black_player) }
       let(:black_kingside_rook) { Rook.new('h8', black_player) }
       let(:black_king) { King.new('e8', black_player) }
@@ -324,7 +324,7 @@ describe Board do
     end
 
     context 'king and rook have not moved but king move spaces are under attack' do
-      subject(:board_castle) { described_class.new([], game_log) }
+      subject(:board_castle) { described_class.new(game_log) }
       let(:white_queenside_rook) { Rook.new('a1', white_player) }
       let(:white_kingside_rook) { Rook.new('h1', white_player) }
       let(:white_king) { King.new('e1', white_player) }
@@ -350,7 +350,7 @@ describe Board do
     end
 
     context 'king or rook have moved' do
-      subject(:board_castle) { described_class.new([], game_log) }
+      subject(:board_castle) { described_class.new(game_log) }
       let(:queenside_rook) { Rook.new('a1', white_player) }
       let(:kingside_rook) { Rook.new('h1', white_player) }
       let(:king) { King.new('e1', white_player) }
@@ -374,7 +374,7 @@ describe Board do
 
   describe '#check?' do
     let(:king) { King.new('b2', white_player) }
-    subject(:board_check) { described_class.new([], game_log) }
+    subject(:board_check) { described_class.new(game_log) }
 
     context 'king unit is in check' do
       it 'returns true' do
@@ -397,7 +397,7 @@ describe Board do
     let(:white_king) { King.new('h1', white_player) }
     let(:black_rook) { Rook.new('g5', black_player) }
     let(:black_knight) { Knight.new('f2', black_player) }
-    subject(:board_checkmate) { described_class.new([], game_log) }
+    subject(:board_checkmate) { described_class.new(game_log) }
 
     context 'king is in check but still has possible moves' do
       it 'returns false' do

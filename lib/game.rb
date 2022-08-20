@@ -10,8 +10,12 @@ class Game
   def initialize(players)
     @players = players
     @game_log = GameLog.new
-    @board = Board.new(new_game_units, game_log)
+    @board = Board.new(game_log)
     @turn = 0
+  end
+
+  def setup_new_board
+    @board.clear_units.add_unit(new_game_units)
   end
 
   def move_unit(player, unit, location)
@@ -43,5 +47,18 @@ class Game
       units += %w[a b c d e f g h].map { |file| Pawn.new("#{file}#{pawn_rank}", player) }
     end
     units
+  end
+
+  # creates a test game
+  def test_game
+    test = Game.new([player1, player2])
+    test_board_units = board.units.map { |unit| unit.dup }
+    test_game_log = game_log.map { |log_item| log_item.dup }
+    test_game_log.each do |log_item|
+      log_item[:unit] = test_board_units.select { |unit| unit.location == log_item[:unit].loation }
+    end
+    test.board.units = test_board_units
+    test.instance_variable_set(:@game_log, test_game_log)
+    test
   end
 end
