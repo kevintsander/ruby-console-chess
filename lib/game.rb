@@ -5,7 +5,7 @@ require './lib/game_log'
 
 # Represents a Chess game
 class Game
-  attr_reader :board, :game_log, :players
+  attr_reader :board, :game_log, :players, :turn
 
   def initialize(players)
     @players = players
@@ -48,8 +48,7 @@ class Game
   end
 
   def attack_unit(player, unit, location)
-    return unless unit.player == player
-
+    allowed_attack_locations = []
     allowed_actions = board.allowed_actions(unit)
     allowed_attack_locations += allowed_actions[:move_attack] if allowed_actions[:move_attack]
     allowed_attack_locations += allowed_actions[:jump_attack] if allowed_actions[:jump_attack]
@@ -57,8 +56,8 @@ class Game
     return unless allowed_attack_locations&.include?(location)
 
     last_location = unit.location
-    unit.move(location)
     captured_unit = board.unit_at(location)
+    unit.move(location)
     captured_unit.capture
 
     game_log.log_action(turn, player, :attack, unit, location, last_location)
@@ -66,17 +65,15 @@ class Game
   end
 
   def en_passant_unit(player, unit, location)
-    return unless unit.player == player
-
     allowed_actions = board.allowed_actions(unit)
     allowed_en_passant_locations = allowed_actions[:en_passant] if allowed_actions[:en_passant]
 
     return unless allowed_en_passant_locations&.include?(location)
 
     last_location = unit.location
-    unit.move(location)
-    captured_unit_location = delta_location(location, [-1 * 0.send(unit.forward, 1), 0])
+    captured_unit_location = board.delta_location(location, [-1 * 0.send(unit.forward, 1), 0])
     captured_unit = board.unit_at(captured_unit_location)
+    unit.move(location)
     captured_unit.capture
 
     game_log.log_action(turn, player, :en_passant, unit, location, last_location)
