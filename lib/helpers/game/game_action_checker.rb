@@ -1,31 +1,25 @@
 # frozen_string_literal: true
 
-module GameActionChecker
-  def allowed_actions(unit)
-    unit.allowed_actions_deltas.each_with_object({}) do |(action, deltas), new_hash|
-      locations = allowed_action_delta_locations(unit, action, deltas)
-      new_hash[action] = locations if locations&.any?
-      new_hash
-    end
-  end
+require './lib/actions/move'
 
-  def valid_standard_move_location?(unit, move_location)
+module GameActionChecker
+  def valid_standard_move_location?(unit, move_location, _action)
     !board.enemy_unit_at_location?(unit, move_location) && !board.unit_blocking_move?(unit, move_location)
   end
 
-  def valid_move_attack_location?(unit, move_location)
+  def valid_move_attack_location?(unit, move_location, _action)
     board.enemy_unit_at_location?(unit, move_location) && !board.unit_blocking_move?(unit, move_location)
   end
 
-  def valid_jump_move_location?(move_location)
+  def valid_jump_move_location?(_unit, move_location, _action)
     !board.unit_at(move_location)
   end
 
-  def valid_jump_attack_location?(unit, move_location)
+  def valid_jump_attack_location?(unit, move_location, _action)
     board.enemy_unit_at_location?(unit, move_location)
   end
 
-  def valid_en_passant_location?(unit, move_location)
+  def valid_en_passant_location?(unit, move_location, _action)
     return false unless unit.is_a?(Pawn)
 
     last_move = @game_log.last_move
@@ -46,7 +40,7 @@ module GameActionChecker
     end
   end
 
-  def valid_initial_double_move_location?(unit, move_location)
+  def valid_initial_double_move_location?(unit, move_location, _action)
     unit.is_a?(Pawn) &&
       !@game_log.unit_actions(unit) &&
       !board.enemy_unit_at_location?(unit, move_location) &&
@@ -57,7 +51,7 @@ module GameActionChecker
     unit_class = unit.class
     return false unless [Rook, King].include?(unit_class)
 
-    other_unit_action = other_castle_unit_action(unit, castle_action)
+    other_unit_action = board.other_castle_unit_action(unit, castle_action)
     return false unless other_unit_action
 
     other_unit = other_unit_action[:unit]
@@ -82,75 +76,27 @@ module GameActionChecker
     true
   end
 
-  def valid_action_location?(unit, move_location, action)
-    # King cannot place self in check
-    return false if unit.is_a?(King) && board.enemy_can_attack_location?(unit, move_location)
-
-    case action
-    when :move_standard
-      valid_standard_move_location?(unit, move_location)
-    when :initial_double
-      valid_initial_double_move_location?(unit, move_location)
-    when :move_attack
-      valid_move_attack_location?(unit, move_location)
-    when :jump_standard
-      valid_jump_move_location?(move_location)
-    when :jump_attack
-      valid_jump_attack_location?(unit, move_location)
-    when :en_passant
-      valid_en_passant_location?(unit, move_location)
-    when :kingside_castle, :queenside_castle
-      valid_castle_location?(unit, move_location, action)
-    end
+  def actions
+    { move_standard: { class: NormalMoveCommand, validator: method(:valid_standard_move_location?) },
+      jump_standard: { class: NormalMoveCommand, validator: method(:valid_jump_move_location?) },
+      move_attack: { class: AttackMoveCommand, validator: method(:valid_move_attack_location?) },
+      jump_attack: { class: AttackMoveCommand, validator: method(:valid_jump_attack_location?) },
+      initial_double: { class: NormalMoveCommand,
+                        validator: method(:valid_initial_double_move_location?) },
+      en_passant: { class: EnPassantCommand, validator: method(:valid_en_passant_location?) },
+      queenside_castle: { class: QueensideCastleCommand, validator: method(:valid_castle_location?) },
+      kingside_castle: { class: KingsideCastleCommand, validator: method(:valid_castle_location?) } }
   end
 
-  private
-
-  def other_castle_unit_action(unit, castle_action)
-    unit_class = unit.class
-    return false unless [Rook, King].include?(unit_class)
-
-    if unit_class == Rook
-      other_unit = friendly_king(unit)
-    elsif unit_class == King
-      other_unit = castle_rook(unit, castle_action)
-    end
-    return unless other_unit
-
-    other_location = unit_castle_action_location(other_unit, castle_action)
-    { unit: other_unit, location: other_location }
-  end
-
-  def unit_castle_action_location(unit, castle_action)
-    allowed_deltas = unit.allowed_actions_deltas[castle_action].first
-    board.delta_location(unit.location, allowed_deltas)
-  end
-
-  def friendly_king(unit)
-    board.friendly_units(unit).select do |friendly|
-      friendly.is_a?(King)
-    end.first
-  end
-
-  def castle_rook(king, castle_action)
-    board.friendly_units(king).select do |friendly|
-      friendly.is_a?(Rook) &&
-        case castle_action
-        when :kingside_castle
-          friendly.kingside_start?
-        when :queenside_castle
-          friendly.queenside_start?
+  def allowed_actions(unit)
+    unit.allowed_actions_deltas.reduce([]) do |all_allowed_actions, (action, deltas)|
+      action_map = actions[action]
+      deltas.each_with_object(all_allowed_actions) do |delta, action_allowed_actions|
+        move_location = board.delta_location(unit.location, delta)
+        if action_map[:validator].call(unit, move_location, action)
+          action_allowed_actions << action_map[:class].new(board, unit, move_location)
         end
-    end.first
-  end
-
-  def allowed_action_delta_locations(unit, action, deltas)
-    deltas.reduce([]) do |locations, delta|
-      location = board.delta_location(unit.location, delta)
-      next locations unless location # out of bounds?
-      next locations unless valid_action_location?(unit, location, action)
-
-      locations << location
+      end
     end
   end
 end
