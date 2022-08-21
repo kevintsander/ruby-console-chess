@@ -2,7 +2,6 @@
 
 require './lib/helpers/location_rank_and_file'
 require './lib/helpers/board/board_location_mapper'
-require './lib/helpers/board/board_move_checker'
 require './lib/helpers/board/board_status_checker'
 require './lib/units/king'
 require './lib/units/queen'
@@ -15,7 +14,6 @@ require './lib/units/pawn'
 class Board
   include LocationRankAndFile
   include BoardLocationMapper
-  include BoardMoveChecker
   include BoardStatusChecker
 
   attr_reader :units
@@ -39,6 +37,11 @@ class Board
     units.select { |unit| unit.location == location }&.first
   end
 
+  def enemy_unit_at_location?(player, location)
+    unit_at_location = unit_at(location)
+    unit_at_location && unit_at_location.player != player
+  end
+
   def unit_blocking_move?(unit, to_location, ignore_unit = nil)
     check_location = unit.location
     until check_location == to_location
@@ -50,14 +53,6 @@ class Board
       return true if unit_at_location && (unit_at_location.player == unit.player || check_location != to_location)
     end
     false
-  end
-
-  def allowed_actions(unit)
-    unit.allowed_actions_deltas.each_with_object({}) do |(action, deltas), new_hash|
-      locations = allowed_action_delta_locations(unit, action, deltas)
-      new_hash[action] = locations if locations&.any?
-      new_hash
-    end
   end
 
   def friendly_units(unit)
@@ -77,18 +72,6 @@ class Board
       end
     else
       units.select { |other| unit.enemy?(other) }
-    end
-  end
-
-  private
-
-  def allowed_action_delta_locations(unit, action, deltas)
-    deltas.reduce([]) do |locations, delta|
-      location = delta_location(unit.location, delta)
-      next locations unless location # out of bounds?
-      next locations unless valid_action_location?(unit, location, action)
-
-      locations << location
     end
   end
 end

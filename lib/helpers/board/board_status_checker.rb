@@ -1,26 +1,29 @@
 # frozen_string_literal: true
 
 module BoardStatusChecker
-  def check?(king)
-    king.is_a?(King) && enemy_can_attack_location?(king, king.location)
+  def enemy_can_attack_move?(unit, move_location)
+    check_location = unit.location
+    until check_location == move_location
+      check_location = step_location(check_location, move_location)
+      return true if enemy_can_attack_location?(unit, check_location)
+    end
+    false
   end
 
-  def checkmate?(king)
-    king.is_a?(King) & check?(king) & !allowed_actions(king)&.any?
+  def enemy_can_attack_location?(unit, location)
+    enemy_units(unit) do |enemy|
+      enemy_location = enemy.location
+      jump_actions = enemy.allowed_actions_deltas[:jump_standard]
+      jump_actions && jump_actions.each do |jump_delta|
+        jump_location = delta_location(enemy_location, jump_delta)
+        return true if jump_location == location
+      end
+      move_actions = enemy.allowed_actions_deltas[:move_standard]
+      move_actions && move_actions.each do |move_delta|
+        move_location = delta_location(enemy_location, move_delta)
+        return true if move_location == location && !unit_blocking_move?(enemy, move_location)
+      end
+    end
+    false
   end
-
-  def stalemate?(king)
-    # king is not already in check
-    # no piece can move without putting the king in check
-    # get all friendly units
-    # test if king would be in check if any of the allowed pieces moved
-    #  should i clone the board and run the test there? or temporarily move the pieces on the current board?
-
-    return false unless king.is_a?(King) & !check?(king) & !allowed_actions(king)&.any?
-
-    # friendly_units(king) do |friendly|
-    #   friendly.allowed_actions do
-  end
-
-  def test_move_board(unit, move_location); end
 end

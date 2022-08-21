@@ -2,9 +2,14 @@
 
 require './lib/board'
 require './lib/game_log'
+require './lib/helpers/game/game_action_checker'
+require './lib/helpers/game/game_status_checker'
 
 # Represents a Chess game
 class Game
+  include GameActionChecker
+  include GameStatusChecker
+
   attr_reader :board, :game_log, :players, :turn
 
   def initialize(players)
@@ -36,7 +41,7 @@ class Game
   end
 
   def move_unit(player, unit, location)
-    allowed_actions = board.allowed_actions(unit)
+    allowed_actions = allowed_actions(unit)
     allowed_move_locations = []
     allowed_move_locations += allowed_actions[:move_standard] if allowed_actions[:move_standard]
     allowed_move_locations += allowed_actions[:jump_standard] if allowed_actions[:jump_standard]
@@ -51,7 +56,7 @@ class Game
 
   def attack_unit(player, unit, location)
     allowed_attack_locations = []
-    allowed_actions = board.allowed_actions(unit)
+    allowed_actions = allowed_actions(unit)
     allowed_attack_locations += allowed_actions[:move_attack] if allowed_actions[:move_attack]
     allowed_attack_locations += allowed_actions[:jump_attack] if allowed_actions[:jump_attack]
 
@@ -67,7 +72,7 @@ class Game
   end
 
   def en_passant_unit(player, unit, location)
-    allowed_actions = board.allowed_actions(unit)
+    allowed_actions = allowed_actions(unit)
     allowed_en_passant_locations = allowed_actions[:en_passant] if allowed_actions[:en_passant]
 
     return unless allowed_en_passant_locations&.include?(location)
@@ -82,33 +87,24 @@ class Game
     game_log.log_action(turn, player, :captured, captured_unit, nil, captured_unit_location)
   end
 
-  def castle_unit(player, castle_action, unit, location)
-    allowed_actions = board.allowed_actions(unit)
+  def castle_unit(player, castle_action, unit, move_location)
+    allowed_actions = allowed_actions(unit)
     allowed_castle_locations = allowed_actions[:kingside_castle]
 
-    return unless allowed_castle_locations&.include?(location)
+    return unless allowed_castle_locations&.include?(move_location)
 
-    unit_class = unit.class
-    if unit_class == Rook
-      rook = unit
-      rook_move_location = location
-    elsif unit_class == King
-      king = unit
-      king_move_location = location
-    end
-    rook ||= board.get_castle_rook(king, castle_action)
-    king ||= board.get_friendly_king(rook)
+    other_unit_action = other_castle_unit_action(unit, castle_action)
+    other_unit = other_unit_action[:unit]
+    other_unit_move_location = other_unit_action[:location]
 
-    rook_last_location = rook.location
-    king_last_location = king.location
-    rook_move_location ||= board.get_unit_castle_action_location(rook, castle_action)
-    king_move_location ||= board.get_unit_castle_action_location(king, castle_action)
+    unit_location = unit.location
+    other_unit_location = other_unit.location
 
-    rook.move(rook_move_location)
-    king.move(king_move_location)
+    unit.move(move_location)
+    other_unit.move(other_unit_move_location)
 
-    game_log.log_action(turn, player, castle_action, rook, rook_move_location, rook_last_location)
-    game_log.log_action(turn, player, castle_action, king, king_move_location, king_last_location)
+    game_log.log_action(turn, player, castle_action, unit, move_location, unit_location)
+    game_log.log_action(turn, player, castle_action, other_unit, other_unit_move_location, other_unit_location)
   end
 
   def new_game_units
@@ -128,12 +124,12 @@ class Game
 
   def stalemate?(king)
     return false unless king.is_a?(King)
-    return false if board.check?(king)
-    return false if board.allowed_actions(king)&.any?
+    return false if check?(king)
+    return false if allowed_actions(king)&.any?
 
     board.friendly_units(king) do |friendly|
       # create test game
-      board.allowed_actions(friendly).each do |action|
+      allowed_actions(friendly).each do |action|
         action_type = action[0]
         action_locations = action[1]
         action_locations.each do |action_location|
@@ -146,7 +142,7 @@ class Game
             test_unit.location == friendly.location
           end.first
           new_test_game.perform_action(king.player, test_friendly_unit, action_type, action_location)
-          return false unless new_test_game.board.check?(test_friendly_king)
+          return false unless new_test_game.check?(test_friendly_king)
         end
       end
     end
@@ -159,9 +155,10 @@ class Game
   def test_game
     test = Game.new(players)
     test_board_units = board.units.map { |unit| unit.dup }
-    test_game_log = game_log.dup
-    test_game_log.instance_variable_set(:@log, test_game_log.log.dup)
-    test_game_log.log.each do |log_item|
+    test_game_log = GameLog.new
+    test_game_log_log = game_log.log.dup
+    test_game_log.instance_variable_set(:@log, test_game_log_log)
+    test_game_log_log.each do |log_item|
       log_item[:unit] = test_board_units.select { |unit| unit.location == log_item[:unit].loation }
     end
     test.board.clear_units.add_unit(*test_board_units)
