@@ -36,7 +36,7 @@ describe Game do
         board_allowed.clear_units.add_unit(king_unit)
         king_result = game_allowed.allowed_actions(king_unit)
 
-        expect(pawn_result[:move_standard].sort).to eq(%w[c4].sort)
+        expect(pawn_result.sort).to eq(%w[c4].sort)
         expect(knight_result[:jump_standard].sort).to eq(%w[g4 f3 g6 f7 d7 c6 c4 d3].sort)
         expect(king_result[:move_standard].sort).to eq(%w[g5 g6 g7 f5 f7 e5 e6 e7].sort)
       end
@@ -475,7 +475,7 @@ describe Game do
     end
 
     context 'king is not in check, but any move will put it in check' do
-      it 'king is not in check but any move will put it in check' do
+      it 'returns true' do
         black_knight = Knight.new('c6', black_player)
         game_stalemate.board.add_unit(black_knight)
         expect(game_stalemate).to be_stalemate(white_king)
