@@ -8,8 +8,8 @@ class GameLog
     @log = []
   end
 
-  def log_action(turn, player, action, unit, location, last_location)
-    log_item = { turn: turn, player: player, action: action, unit: unit, location: location,
+  def log_action(turn, action, unit, location, last_location)
+    log_item = { turn: turn, action: action, unit: unit, location: location,
                  last_location: last_location }
     @log << log_item
   end

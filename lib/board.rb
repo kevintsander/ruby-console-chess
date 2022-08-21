@@ -74,4 +74,47 @@ class Board
       units.select { |other| unit.enemy?(other) }
     end
   end
+
+  def other_castle_unit(unit, castle_action)
+    if unit_class == Rook
+      friendly_king(unit)
+    elsif unit_class == King
+      castle_rook(unit, castle_action)
+    end
+  end
+
+  def other_castle_unit_action(unit, castle_action)
+    unit_class = unit.class
+    return false unless [Rook, King].include?(unit_class)
+
+    other_unit = other_castle_unit(unit)
+    return unless other_unit
+
+    other_unit.allowed_actions[castle_action].first
+  end
+
+  private
+
+  def unit_castle_action_location(unit, castle_action)
+    allowed_deltas = unit.allowed_actions_deltas[castle_action].first
+    board.delta_location(unit.location, allowed_deltas)
+  end
+
+  def friendly_king(unit)
+    board.friendly_units(unit).select do |friendly|
+      friendly.is_a?(King)
+    end.first
+  end
+
+  def castle_rook(king, castle_action)
+    board.friendly_units(king).select do |friendly|
+      friendly.is_a?(Rook) &&
+        case castle_action
+        when :kingside_castle
+          friendly.kingside_start?
+        when :queenside_castle
+          friendly.queenside_start?
+        end
+    end.first
+  end
 end
