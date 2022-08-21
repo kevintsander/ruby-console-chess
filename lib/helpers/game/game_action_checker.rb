@@ -29,8 +29,9 @@ module GameActionChecker
   end
 
   def valid_jump_attack_location?(jump_attack_action)
+    unit = jump_attack_action.unit
     move_location = jump_attack_action.location
-    board.enemy_unit_at_location?(move_location)
+    board.enemy_unit_at_location?(unit, move_location)
   end
 
   def valid_en_passant_location?(en_passant_action)
@@ -71,12 +72,12 @@ module GameActionChecker
     unit_class = unit.class
     return false unless [Rook, King].include?(unit_class)
 
-    other_unit_action = other_castle_unit_action(unit, action.class)
-    return false unless other_unit_action
+    castle_action_class = action.class
+    other_unit = other_castle_unit(unit, castle_action_class)
+    return false unless other_unit
 
     move_location = action.location
-    other_unit = other_unit_action.unit
-    other_unit_move_location = other_unit_action.location
+    other_unit_move_location = castle_unit_move_location(other_unit, castle_action_class)
 
     # cannot be blocked or have an enemy on the move space
     return false if board.enemy_unit_at_location?(unit,
@@ -157,31 +158,37 @@ module GameActionChecker
     end
   end
 
+  def other_castle_unit_action(unit, castle_action_class)
+    other_unit = other_castle_unit(unit, castle_action_class)
+    other_unit.allowed_actions.detect { |action| action.is_a?(castle_action_class) }
+  end
+
   private
 
   def friendly_king(unit)
-    board.friendly_units(unit).select do |friendly|
+    board.friendly_units(unit).detect do |friendly|
       friendly.is_a?(King)
-    end.first
+    end
   end
 
   def castle_rook(king, castle_action_class)
-    board.friendly_units(king).select do |friendly|
+    board.friendly_units(king).detect do |friendly|
       friendly.is_a?(Rook) &&
-        case castle_action_class
-        when KingsideCastleCommand
+        if castle_action_class == KingsideCastleCommand
           friendly.kingside_start?
-        when QueensideCastleCommand
+        elsif castle_action_class == QueensideCastleCommand
           friendly.queenside_start?
         end
-    end.first
+    end
   end
 
-  def other_castle_unit_action(unit, castle_action_class)
-    other_unit = other_castle_unit(unit, castle_action_class)
-    return unless other_unit
-
-    allowed_actions(other_unit).detect { |action| action.is_a?(castle_action_class) }
+  def castle_unit_move_location(unit, castle_action_class)
+    delta = if castle_action_class == KingsideCastleCommand
+              unit.allowed_actions_deltas[:kingside_castle].first
+            elsif castle_action_class == QueensideCastleCommand
+              unit.allowed_actions_deltas[:queenside_castle].first
+            end
+    board.delta_location(unit.location, delta)
   end
 
   # creates a test game

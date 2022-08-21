@@ -20,13 +20,24 @@ describe Game do
     subject(:game_allowed) { blank_game }
     subject(:board_allowed) { Board.new(blank_log) }
 
+    matcher :match_locations do |check_locations, action_command_type = nil|
+      match do |actions|
+        test_actions = action_command_type ? actions.select { |action| action.is_a?(action_command_type) } : actions
+        test_actions_locations = test_actions.map(&:location)
+        check_locations.each do |check_location|
+          return false unless test_actions_locations.include?(check_location)
+        end
+        true
+      end
+    end
+
     before do
       blank_game.instance_variable_set(:@board, board_allowed)
     end
 
     context 'moves inside boundary' do
       it 'returns all moves' do
-        pawn_unit = Pawn.new('c3', white_player)
+        pawn_unit = Pawn.new('c2', white_player)
         knight_unit = Knight.new('e5', black_player)
         king_unit = King.new('f6', white_player)
         board_allowed.add_unit(pawn_unit)
@@ -36,9 +47,9 @@ describe Game do
         board_allowed.clear_units.add_unit(king_unit)
         king_result = game_allowed.allowed_actions(king_unit)
 
-        expect(pawn_result.sort).to eq(%w[c4].sort)
-        expect(knight_result[:jump_standard].sort).to eq(%w[g4 f3 g6 f7 d7 c6 c4 d3].sort)
-        expect(king_result[:move_standard].sort).to eq(%w[g5 g6 g7 f5 f7 e5 e6 e7].sort)
+        expect(pawn_result).to match_locations(%w[c3 c4], NormalMoveCommand)
+        expect(knight_result).to match_locations(%w[g4 f3 g6 f7 d7 c6 c4 d3], NormalMoveCommand)
+        expect(king_result).to match_locations(%w[g5 g6 g7 f5 f7 e5 e6 e7], NormalMoveCommand)
       end
     end
 
@@ -51,22 +62,26 @@ describe Game do
         queen_unit = Queen.new('b7', black_player)
         king_unit = King.new('h8', white_player)
 
-        allow(board_allowed).to receive(:units).and_return([pawn_unit], [rook_unit], [bishop_unit], [queen_unit],
-                                                           [king_unit])
+        board_allowed.add_unit(pawn_unit)
         pawn_result = game_allowed.allowed_actions(pawn_unit)
+        board_allowed.clear_units.add_unit(rook_unit)
         rook_result = game_allowed.allowed_actions(rook_unit)
+        board_allowed.clear_units.add_unit(knight_unit)
         knight_result = game_allowed.allowed_actions(knight_unit)
+        board_allowed.clear_units.add_unit(bishop_unit)
         bishop_result = game_allowed.allowed_actions(bishop_unit)
+        board_allowed.clear_units.add_unit(queen_unit)
         queen_result = game_allowed.allowed_actions(queen_unit)
+        board_allowed.clear_units.add_unit(king_unit)
         king_result = game_allowed.allowed_actions(king_unit)
 
         expect(pawn_result).to be_empty
-        expect(rook_result[:move_standard].sort).to eq(%w[c1 c2 c4 c5 c6 c7 c8 a3 b3 d3 e3 f3 g3 h3].sort)
-        expect(knight_result[:jump_standard].sort).to eq(%w[f7 g6].sort)
-        expect(bishop_result[:move_standard].sort).to eq(%w[d1 f1 d3 c4 b5 a6 f3 g4 h5].sort)
-        expect(queen_result[:move_standard].sort).to eq(%w[a8 a7 a6 b8 c8 c7 d7 e7 f7 g7 h7 c6 d5 e4 f3 g2 h1 b6 b5 b4
-                                                           b3 b2 b1].sort)
-        expect(king_result[:move_standard].sort).to eq(%w[h7 g7 g8].sort)
+        expect(rook_result).to match_locations(%w[c1 c2 c4 c5 c6 c7 c8 a3 b3 d3 e3 f3 g3 h3], NormalMoveCommand)
+        expect(knight_result).to match_locations(%w[f7 g6], NormalMoveCommand)
+        expect(bishop_result).to match_locations(%w[d1 f1 d3 c4 b5 a6 f3 g4 h5], NormalMoveCommand)
+        expect(queen_result).to match_locations(%w[a8 a7 a6 b8 c8 c7 d7 e7 f7 g7 h7 c6 d5 e4 f3 g2 h1 b6 b5 b4
+                                                   b3 b2 b1], NormalMoveCommand)
+        expect(king_result).to match_locations(%w[h7 g7 g8], NormalMoveCommand)
       end
     end
 
@@ -83,9 +98,9 @@ describe Game do
         rook_result = game_allowed.allowed_actions(rook_unit)
         queen_result = game_allowed.allowed_actions(queen_unit)
 
-        expect(bishop_result[:move_standard].sort).to eq(%w[b7 a8 b5 a4 d5 d7 e8].sort)
-        expect(rook_result[:move_standard].sort).to eq(%w[e7 e8 d6 e5 f6 g6 h6].sort)
-        expect(queen_result[:move_standard].sort).to eq(%w[h4 h5 h3 g5 g6 g7 g8 g3 g2 g1 e2 d1 f3 f4 f5].sort)
+        expect(bishop_result).to match_locations(%w[b7 a8 b5 a4 d5 d7 e8], NormalMoveCommand)
+        expect(rook_result).to match_locations(%w[e7 e8 d6 e5 f6 g6 h6], NormalMoveCommand)
+        expect(queen_result).to match_locations(%w[h4 h5 h3 g5 g6 g7 g8 g3 g2 g1 e2 d1 f3 f4 f5], NormalMoveCommand)
       end
     end
 
@@ -102,8 +117,8 @@ describe Game do
         queen_result = game_allowed.allowed_actions(queen)
         enemy_knight_result = game_allowed.allowed_actions(enemy_knight)
 
-        expect(queen_result[:move_attack].sort).to eq(%w[f1 f8 d4].sort)
-        expect(enemy_knight_result[:jump_attack]).to eq(%w[f6])
+        expect(queen_result).to match_locations(%w[f1 f8 d4], AttackMoveCommand)
+        expect(enemy_knight_result).to match_locations(%w[f6], AttackMoveCommand)
       end
     end
 
@@ -119,8 +134,8 @@ describe Game do
         white_rook_result = game_allowed.allowed_actions(white_rook)
         black_rook_result = game_allowed.allowed_actions(black_rook)
 
-        expect(white_rook_result[:move_attack]).to eq(%w[c1])
-        expect(black_rook_result[:move_attack]).to eq(%w[a2])
+        expect(white_rook_result).to match_locations(%w[c1], AttackMoveCommand)
+        expect(black_rook_result).to match_locations(%w[a2], AttackMoveCommand)
       end
     end
 
@@ -135,14 +150,17 @@ describe Game do
 
       it 'adjacent pawn can en passant' do
         adjacent_pawn = Pawn.new('e4', black_player)
+        board_allowed.add_unit(enemy_pawn_jumped_two, adjacent_pawn)
         adjacent_pawn_result = game_allowed.allowed_actions(adjacent_pawn)
-        expect(adjacent_pawn_result[:en_passant]).to eq(['d3'])
+        expect(adjacent_pawn_result).to match_locations(['d3'], EnPassantCommand)
       end
 
       it 'non-adjacent pawn cannot en passant' do
         non_adjacent_pawn = Pawn.new('f4', black_player)
+        board_allowed.add_unit(enemy_pawn_jumped_two, non_adjacent_pawn)
         non_adjacent_pawn_result = game_allowed.allowed_actions(non_adjacent_pawn)
-        expect(non_adjacent_pawn_result[:en_passant]).to eq(nil)
+        en_passant_move_result = non_adjacent_pawn_result.detect { |action| action.is_a?(EnPassantCommand) }
+        expect(en_passant_move_result).to be(nil)
       end
     end
 
@@ -156,8 +174,9 @@ describe Game do
       end
 
       it 'allowed to double move' do
+        board_allowed.add_unit(new_pawn)
         result = game_allowed.allowed_actions(new_pawn)
-        expect(result[:initial_double]).to eq(['h5'])
+        expect(result).to match_locations(%w[h5 h6], NormalMoveCommand)
       end
     end
 
@@ -171,8 +190,9 @@ describe Game do
       end
 
       it 'not allowed to double move' do
+        board_allowed.add_unit(moved_pawn)
         result = game_allowed.allowed_actions(moved_pawn)
-        expect(result[:initial_double]).to eq(nil)
+        expect(result).not_to match_locations(['h4'], NormalMoveCommand)
       end
     end
 
@@ -188,11 +208,8 @@ describe Game do
       it 'not allowed to double move' do
         allow(board_allowed).to receive(:units).and_return([new_pawn, blocking_friendly])
         blocking_friendly_result = game_allowed.allowed_actions(new_pawn)
-        allow(board_allowed).to receive(:units).and_return([new_pawn, enemy_on_space])
-        enemy_on_space_result = game_allowed.allowed_actions(new_pawn)
 
-        expect(blocking_friendly_result[:initial_double]).to eq(nil)
-        expect(enemy_on_space_result[:initial_double]).to eq(nil)
+        expect(blocking_friendly_result).not_to match_locations(['h5'], NormalMoveCommand)
       end
     end
 
@@ -219,7 +236,7 @@ describe Game do
         black_queenside_king_result = game_allowed.allowed_actions(black_queenside_rook)
         black_kingside_rook_result = game_allowed.allowed_actions(black_kingside_rook)
 
-        expect(white_king_result[:queenside_castle]).to eq(['c1'])
+        expect(white_king_result).to match_locations(['c1'], QueensideCastleCommand)
       end
     end
 
