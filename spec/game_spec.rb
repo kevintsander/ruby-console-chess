@@ -257,10 +257,10 @@ describe Game do
         black_kingside_rook_result = game_allowed.allowed_actions(black_kingside_rook)
         black_king_result = game_allowed.allowed_actions(black_king)
 
-        expect(black_queenside_rook_result[:queenside_castle]).to eq(nil)
-        expect(black_kingside_rook_result[:kingside_castle]).to eq(nil)
-        expect(black_king_result[:kingside_castle]).to eq(nil)
-        expect(black_king_result[:queenside_castle]).to eq(nil)
+        expect(black_queenside_rook_result).not_to match_locations(['d8'], QueensideCastleCommand)
+        expect(black_kingside_rook_result).not_to match_locations(['f8'], KingsideCastleCommand)
+        expect(black_king_result).not_to match_locations(['g8'], KingsideCastleCommand)
+        expect(black_king_result).not_to match_locations(['c8'], QueensideCastleCommand)
       end
     end
 
@@ -281,10 +281,10 @@ describe Game do
         kingside_rook_result = game_allowed.allowed_actions(white_kingside_rook)
         king_result = game_allowed.allowed_actions(white_king)
 
-        expect(queenside_rook_result[:queenside_castle]).to eq(nil)
-        expect(kingside_rook_result[:kingside_castle]).to eq(nil)
-        expect(king_result[:kingside_castle]).to eq(nil)
-        expect(king_result[:queenside_castle]).to eq(nil)
+        expect(queenside_rook_result).not_to match_locations(['d1'], QueensideCastleCommand)
+        expect(kingside_rook_result).not_to match_locations(['f1'], KingsideCastleCommand)
+        expect(king_result).not_to match_locations(['g1'], KingsideCastleCommand)
+        expect(king_result).not_to match_locations(['c1'], QueensideCastleCommand)
       end
     end
 
@@ -302,10 +302,11 @@ describe Game do
         queenside_rook_result = game_allowed.allowed_actions(queenside_rook)
         kingside_rook_result = game_allowed.allowed_actions(kingside_rook)
         king_result = game_allowed.allowed_actions(king)
-        expect(queenside_rook_result[:queenside_castle]).to eq(nil)
-        expect(kingside_rook_result[:kingside_castle]).to eq(nil)
-        expect(king_result[:queenside_castle]).to eq(nil)
-        expect(king_result[:kingside_castle]).to eq(nil)
+
+        expect(queenside_rook_result).not_to match_locations(['d1'], QueensideCastleCommand)
+        expect(kingside_rook_result).not_to match_locations(['f1'], KingsideCastleCommand)
+        expect(king_result).not_to match_locations(['g1'], KingsideCastleCommand)
+        expect(king_result).not_to match_locations(['c1'], QueensideCastleCommand)
       end
     end
   end
