@@ -11,6 +11,17 @@ module GameActionChecker
 
   @test_game = false
 
+  def actions_map
+    { normal_move: { class: NormalMoveCommand, validator: method(:valid_standard_move_location?) },
+      jump_move: { class: NormalMoveCommand, validator: method(:valid_jump_move_location?) },
+      normal_attack: { class: AttackMoveCommand, validator: method(:valid_move_attack_location?) },
+      jump_attack: { class: AttackMoveCommand, validator: method(:valid_jump_attack_location?) },
+      initial_double: { class: NormalMoveCommand, validator: method(:valid_initial_double_move_location?) },
+      en_passant: { class: EnPassantCommand, validator: method(:valid_en_passant_location?) },
+      queenside_castle: { class: QueensideCastleCommand, validator: method(:valid_castle_location?) },
+      kingside_castle: { class: KingsideCastleCommand, validator: method(:valid_castle_location?) } }
+  end
+
   def valid_standard_move_location?(move_action)
     unit = move_action.unit
     move_location = move_action.location
@@ -76,20 +87,24 @@ module GameActionChecker
     unit_class = unit.class
     return false unless [Rook, King].include?(unit_class)
 
-    castle_action_class = action.class
-    other_unit = other_castle_unit(unit, castle_action_class)
-    return false unless other_unit
+    castle_type = if action.is_a?(KingsideCastleCommand)
+                    :kingside_castle
+                  elsif action.is_a?(QueensideCastleCommand)
+                    :queenside_castle
+                  end
+
+    other_unit_hash = board.other_castle_unit_move_hash(unit, castle_type)
+    return false unless other_unit_hash&.any?
 
     move_location = action.location
-    other_unit_move_location = castle_unit_move_location(other_unit, castle_action_class)
+    other_unit = other_unit_hash[:unit]
+    other_unit_move_location = other_unit_hash[:move_location]
 
     # cannot be blocked or have an enemy on the move space
-    return false if board.enemy_unit_at_location?(unit,
-                                                  move_location) || board.unit_blocking_move?(unit, move_location,
-                                                                                              other_unit)
-    return false if board.enemy_unit_at_location?(other_unit,
-                                                  other_unit_move_location) || board.unit_blocking_move?(other_unit,
-                                                                                                         other_unit_move_location, unit)
+    return false if board.enemy_unit_at_location?(unit, move_location) ||
+                    board.unit_blocking_move?(unit, move_location, other_unit)
+    return false if board.enemy_unit_at_location?(other_unit, other_unit_move_location) ||
+                    board.unit_blocking_move?(other_unit, other_unit_move_location, unit)
 
     # neither unit can have moved
     return false if [unit, other_unit].any? { |castle_unit| @game_log.unit_actions(castle_unit) }
@@ -102,22 +117,10 @@ module GameActionChecker
     true
   end
 
-  def actions
-    { normal_move: { class: NormalMoveCommand, validator: method(:valid_standard_move_location?) },
-      jump_move: { class: NormalMoveCommand, validator: method(:valid_jump_move_location?) },
-      normal_attack: { class: AttackMoveCommand, validator: method(:valid_move_attack_location?) },
-      jump_attack: { class: AttackMoveCommand, validator: method(:valid_jump_attack_location?) },
-      initial_double: { class: NormalMoveCommand,
-                        validator: method(:valid_initial_double_move_location?) },
-      en_passant: { class: EnPassantCommand, validator: method(:valid_en_passant_location?) },
-      queenside_castle: { class: QueensideCastleCommand, validator: method(:valid_castle_location?) },
-      kingside_castle: { class: KingsideCastleCommand, validator: method(:valid_castle_location?) } }
-  end
-
   def allowed_actions(unit)
     allowed = []
     unit.allowed_actions_deltas.each do |(action_type, deltas)|
-      action_map = actions[action_type]
+      action_map = actions_map[action_type]
       deltas.each do |delta|
         move_location = board.delta_location(unit.location, delta)
         next unless move_location
@@ -154,46 +157,7 @@ module GameActionChecker
     new_test_game.check?(test_friendly_king)
   end
 
-  def other_castle_unit(unit, castle_action_class)
-    if unit.is_a?(Rook)
-      friendly_king(unit)
-    elsif unit.is_a?(King)
-      castle_rook(unit, castle_action_class)
-    end
-  end
-
-  def other_castle_unit_action(unit, castle_action_class)
-    other_unit = other_castle_unit(unit, castle_action_class)
-    other_unit.allowed_actions.detect { |action| action.is_a?(castle_action_class) }
-  end
-
   private
-
-  def friendly_king(unit)
-    board.friendly_units(unit).detect do |friendly|
-      friendly.is_a?(King)
-    end
-  end
-
-  def castle_rook(king, castle_action_class)
-    board.friendly_units(king).detect do |friendly|
-      friendly.is_a?(Rook) &&
-        if castle_action_class == KingsideCastleCommand
-          friendly.kingside_start?
-        elsif castle_action_class == QueensideCastleCommand
-          friendly.queenside_start?
-        end
-    end
-  end
-
-  def castle_unit_move_location(unit, castle_action_class)
-    delta = if castle_action_class == KingsideCastleCommand
-              unit.allowed_actions_deltas[:kingside_castle].first
-            elsif castle_action_class == QueensideCastleCommand
-              unit.allowed_actions_deltas[:queenside_castle].first
-            end
-    board.delta_location(unit.location, delta)
-  end
 
   # creates a test game
   def get_test_game_copy

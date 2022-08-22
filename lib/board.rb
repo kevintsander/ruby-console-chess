@@ -82,7 +82,10 @@ class Board
       next if castle_type == :queenside_castle && !friendly.is_a?(King) && !friendly.queenside_start?
 
       delta = friendly.allowed_actions_deltas[castle_type]&.first
+      next unless delta
+
       return { unit: friendly, move_location: delta_location(friendly.location, delta) }
     end
+    nil
   end
 end
