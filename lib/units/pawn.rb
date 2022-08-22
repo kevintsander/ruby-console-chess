@@ -6,9 +6,9 @@ require './lib/unit'
 class Pawn < Unit
   def initialize(location, player, id = location)
     super(location, player, id)
-    @allowed_actions_deltas = { move_standard: pawn_move_delta,
+    @allowed_actions_deltas = { normal_move: pawn_move_delta,
                                 initial_double: pawn_double_delta,
-                                move_attack: pawn_attack_deltas,
+                                normal_attack: pawn_attack_deltas,
                                 en_passant: pawn_attack_deltas }
   end
 

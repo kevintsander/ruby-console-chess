@@ -185,7 +185,7 @@ describe Game do
 
       before do
         allow(blank_board).to receive(:units).and_return([moved_pawn])
-        allow(blank_log).to receive(:unit_actions).with(moved_pawn).and_return({ action: :move_standard,
+        allow(blank_log).to receive(:unit_actions).with(moved_pawn).and_return({ action: :normal_move,
                                                                                  last_location: 'h7' })
       end
 
@@ -295,7 +295,7 @@ describe Game do
 
       before do
         board_allowed.add_unit(queenside_rook, kingside_rook, king)
-        allow(blank_log).to receive(:unit_actions).and_return({ action: :move_standard })
+        allow(blank_log).to receive(:unit_actions).and_return({ action: :normal_move })
       end
 
       it 'cannot castle' do

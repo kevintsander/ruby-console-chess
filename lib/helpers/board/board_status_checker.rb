@@ -15,12 +15,12 @@ module BoardStatusChecker
       return if enemy.captured?
 
       enemy_location = enemy.location
-      jump_actions = enemy.allowed_actions_deltas[:jump_standard]
+      jump_actions = enemy.allowed_actions_deltas[:jump_move]
       jump_actions && jump_actions.each do |jump_delta|
         jump_location = delta_location(enemy_location, jump_delta)
         return true if jump_location == location
       end
-      move_actions = enemy.allowed_actions_deltas[:move_standard]
+      move_actions = enemy.allowed_actions_deltas[:normal_move]
       move_actions && move_actions.each do |move_delta|
         move_location = delta_location(enemy_location, move_delta)
         return true if move_location == location && !unit_blocking_move?(enemy, move_location)

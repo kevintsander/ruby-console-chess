@@ -103,9 +103,9 @@ module GameActionChecker
   end
 
   def actions
-    { move_standard: { class: NormalMoveCommand, validator: method(:valid_standard_move_location?) },
-      jump_standard: { class: NormalMoveCommand, validator: method(:valid_jump_move_location?) },
-      move_attack: { class: AttackMoveCommand, validator: method(:valid_move_attack_location?) },
+    { normal_move: { class: NormalMoveCommand, validator: method(:valid_standard_move_location?) },
+      jump_move: { class: NormalMoveCommand, validator: method(:valid_jump_move_location?) },
+      normal_attack: { class: AttackMoveCommand, validator: method(:valid_move_attack_location?) },
       jump_attack: { class: AttackMoveCommand, validator: method(:valid_jump_attack_location?) },
       initial_double: { class: NormalMoveCommand,
                         validator: method(:valid_initial_double_move_location?) },
