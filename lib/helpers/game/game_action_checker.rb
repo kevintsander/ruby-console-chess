@@ -157,6 +157,15 @@ module GameActionChecker
     new_test_game.check?(test_friendly_king)
   end
 
+  def can_promote_unit?(unit)
+    return false unless unit.is_a?(Pawn)
+
+    forward_delta = [0.send(unit.forward, 1), 0]
+    test_forward_location = board.delta_location(unit.location, forward_delta)
+
+    test_forward_location ? false : true
+  end
+
   private
 
   # creates a test game

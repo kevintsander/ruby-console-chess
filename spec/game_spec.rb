@@ -407,4 +407,27 @@ describe Game do
       end
     end
   end
+
+  describe '#can_promote_unit?' do
+    subject(:game_can_promote) { blank_game }
+    let(:board_can_promote) { double('board') }
+
+    context 'pawn is on last space' do
+      it 'returns true' do
+        promotable_pawn = Pawn.new('b1', black_player)
+        allow(board_can_promote).to receive(:delta_location).with('b1', [-1, 0]).and_return(nil)
+        allow(game_can_promote).to receive(:board).and_return(board_can_promote)
+        expect(game_can_promote).to be_can_promote_unit(promotable_pawn)
+      end
+    end
+
+    context 'pawn is not on last space' do
+      it 'returns false' do
+        promotable_pawn = Pawn.new('b2', black_player)
+        allow(board_can_promote).to receive(:delta_location).with('b2', [-1, 0]).and_return('b1')
+        allow(game_can_promote).to receive(:board).and_return(board_can_promote)
+        expect(game_can_promote).not_to be_can_promote_unit(promotable_pawn)
+      end
+    end
+  end
 end
