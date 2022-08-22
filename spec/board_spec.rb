@@ -87,4 +87,17 @@ describe Board do
       end
     end
   end
+
+  describe '#other_castle_unit_move_hash' do
+    subject(:board_move_hash) { described_class.new(game_log) }
+    let(:king) { double('king', kingside_start?: true, is_a?: King, location: 'e8') }
+    let(:kingside_rook) { double('rook', kingside_start?: true, is_a?: Rook, location: 'h8') }
+
+    it 'returns the other unit and move location' do
+      allow(king).to receive(:allowed_actions_deltas).and_return({ kingside_castle: [[0, 2]] })
+      allow(board_move_hash).to receive(:friendly_units).and_yield(king)
+      result = board_move_hash.other_castle_unit_move_hash(kingside_rook, :kingside_castle)
+      expect(result).to eq({ unit: king, move_location: 'g8' })
+    end
+  end
 end

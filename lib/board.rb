@@ -33,8 +33,9 @@ class Board
     self
   end
 
-  def unit_at(location)
-    units.select { |unit| unit.location == location }&.first
+  def unit_at(location, delta = nil)
+    at_location = delta ? delta_location(location, delta) : location
+    units.select { |unit| unit.location == at_location }&.first
   end
 
   def enemy_unit_at_location?(player, location)
@@ -72,6 +73,16 @@ class Board
       end
     else
       units.select { |other| unit.enemy?(other) }
+    end
+  end
+
+  def other_castle_unit_move_hash(unit, castle_type)
+    friendly_units(unit) do |friendly|
+      next if castle_type == :kingside_castle && !friendly.kingside_start?
+      next if castle_type == :queenside_castle && !friendly.is_a?(King) && !friendly.queenside_start?
+
+      delta = friendly.allowed_actions_deltas[castle_type]&.first
+      return { unit: friendly, move_location: delta_location(friendly.location, delta) }
     end
   end
 end
