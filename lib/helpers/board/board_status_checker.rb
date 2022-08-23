@@ -12,7 +12,7 @@ module BoardStatusChecker
 
   def enemy_can_attack_location?(unit, location)
     enemy_units(unit) do |enemy|
-      return if enemy.captured?
+      return if enemy.off_board?
 
       enemy_location = enemy.location
       jump_actions = enemy.allowed_actions_deltas[:jump_move]

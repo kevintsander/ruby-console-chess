@@ -24,20 +24,20 @@ describe Unit do
     end
   end
 
-  describe '#captured?' do
+  describe '#off_board?' do
     context 'unit has no location' do
       subject(:unit_captured) { described_class.new('g5', white_player) }
 
       it 'returns true' do
         unit_captured.instance_variable_set(:@location, nil)
-        expect(unit_captured).to be_captured
+        expect(unit_captured).to be_off_board
       end
     end
 
     context 'unit has a location' do
       subject(:unit_alive) { described_class.new('g5', white_player) }
       it 'returns false' do
-        expect(unit_alive).not_to be_captured
+        expect(unit_alive).not_to be_off_board
       end
     end
   end

@@ -16,14 +16,22 @@ class Unit
     @id = id
     @symbol = get_color_symbol(player.color)
     @initial_location = location
+    @captured = false
+    @promoted = false
   end
 
-  def captured?
+  def off_board?
     !location
   end
 
   def capture
     @location = nil
+    @captured = true
+  end
+
+  def promote
+    @location = nil
+    @promoted = true
   end
 
   def move(location)

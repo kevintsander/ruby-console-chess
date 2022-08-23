@@ -103,7 +103,7 @@ class Unit {
   +symbol
   +location
   +new(location, player, id = location)
-  +captured?()
+  +off_board?()
   +capture()
   +allowed_actions_deltas()
   +move(location)
