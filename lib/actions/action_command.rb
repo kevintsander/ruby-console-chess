@@ -10,5 +10,16 @@ class ActionCommand
     @location = location
     @last_location = unit.location
     @captured_unit = nil
+    @promoted_unit_class = nil
+    @promoted_unit = nil
+  end
+
+  def perform_action
+    perform_moves
+    do_promotion
+  end
+
+  def do_promotion
+    @promoted_unit = @promoted_unit_class.new(unit.location, unit.player) if @promoted_unit_class
   end
 end

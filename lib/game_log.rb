@@ -18,6 +18,10 @@ class GameLog
     @log&.last
   end
 
+  def last_unit
+    last_move[:unit]
+  end
+
   def unit_actions(unit)
     @log.select do |log_item|
       log_item[:unit] = unit
