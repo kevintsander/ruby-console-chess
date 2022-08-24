@@ -19,7 +19,7 @@ class GameLog
   end
 
   def last_unit
-    last_move[:unit]
+    last_move[:unit] if last_move
   end
 
   def unit_actions(unit)

@@ -14,6 +14,10 @@ class ActionCommand
     @promoted_unit = nil
   end
 
+  def ==(other)
+    other.class == self.class && other.board == board && other.unit == unit && other.location == location
+  end
+
   def perform_action
     perform_moves
     do_promotion

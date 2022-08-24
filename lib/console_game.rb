@@ -1,22 +1,16 @@
 # frozen_string_literal: true
 
+require './lib/game'
+require './lib/player'
+
 class ConsoleGame
-  def initialize(game)
-    @game = game
-  end
 
-  def create_player
-    get_player_name
-    get_player_color
-  end
-
-  def play_game
-    introduction
-    create_player # 1
-    create_playe # 2
-    start_game
+  def display_game
+    display_introduction
+    create_players
+    game.start
     play_turn until game.game_over?
-    display_game_over_message
+    display_game_over
   end
 
   def play_turn
@@ -25,5 +19,20 @@ class ConsoleGame
     get_action
     add_promote_unit
     perform_action on game
+  end
+
+  def get_player_name(:color)
+    puts "Who will control the #{:color.to_s} pieces? (Enter player name)"
+    gets.chomp
+  end
+
+  def create_players
+    @white_player = create_player(:white)
+    @black_player = create_player(:black)
+  end
+
+  def create_player(color)
+    name = get_player_name
+    Player.new(name, color)
   end
 end

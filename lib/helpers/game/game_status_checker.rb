@@ -26,6 +26,6 @@ module GameStatusChecker
   end
 
   def fifty_turn_draw?
-    turns >= 50
+    turn > 50
   end
 end
