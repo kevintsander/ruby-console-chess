@@ -3,12 +3,13 @@
 # Represents a chess move
 class ActionCommand
   attr_reader :board, :unit, :location, :action, :captured_unit
+  attr_writer :promoted_unit_class
 
   def initialize(board, unit, location)
     @board = board
     @unit = unit
     @location = location
-    @last_location = unit.location
+    @from_location = nil
     @captured_unit = nil
     @promoted_unit_class = nil
     @promoted_unit = nil
@@ -19,11 +20,14 @@ class ActionCommand
   end
 
   def perform_action
+    @from_location = unit.location
     perform_moves
-    do_promotion
+    do_promotion if @promoted_unit_class
   end
 
   def do_promotion
-    @promoted_unit = @promoted_unit_class.new(unit.location, unit.player) if @promoted_unit_class
+    unit.promote
+    @promoted_unit = @promoted_unit_class.new(@location, unit.player)
+    board.add_unit(@promoted_unit)
   end
 end

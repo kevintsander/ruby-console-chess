@@ -311,11 +311,6 @@ describe Game do
     end
   end
 
-  describe '#promote' do
-    xit 'removes the pawn and adds the promotee' do
-    end
-  end
-
   describe '#stalemate?' do
     subject(:game_stalemate) { blank_game }
     let(:board_stalemate) { Board.new(blank_log) }

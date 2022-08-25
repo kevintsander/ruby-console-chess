@@ -29,7 +29,9 @@ class Board
   end
 
   def add_unit(*args)
-    args.each { |unit| @units << unit }
+    args.each do |unit|
+      @units << unit
+    end
     self
   end
 
