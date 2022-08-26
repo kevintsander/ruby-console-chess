@@ -3,8 +3,8 @@
 require './lib/game'
 
 describe Game do
-  let(:white_player) { double('player', color: :white) }
-  let(:black_player) { double('player', color: :black) }
+  let(:white_player) { double('white_player', color: :white) }
+  let(:black_player) { double('black_player', color: :black) }
   let(:blank_log) { double('blank_log', log: [], last_move: nil) }
   let(:blank_board) { double('board', units: []) }
   subject(:blank_game) { described_class.new([white_player, black_player]) }
@@ -422,6 +422,113 @@ describe Game do
         allow(board_can_promote).to receive(:delta_location).with('b2', [-1, 0]).and_return('b1')
         allow(game_can_promote).to receive(:board).and_return(board_can_promote)
         expect(game_can_promote).not_to be_can_promote_unit(promotable_pawn)
+      end
+    end
+  end
+
+  describe '#perform_action' do
+    subject(:game_perform) { described_class.new([white_player, black_player]) }
+
+    context 'game has not started' do
+      let(:action) { double('action', unit: double('unit', player: white_player)) }
+
+      before do
+        allow(game_perform).to receive(:turn).and_return(0)
+        allow(game_perform).to receive(:current_player).and_return(white_player)
+        allow(game_perform).to receive(:game_over?).and_return(false)
+        allow(game_perform).to receive(:can_promote_unit?).and_return(false)
+        allow(game_perform).to receive(:allowed_actions).and_return(action)
+      end
+
+      it 'raises error' do
+        expect { game_perform.perform_action(action) }.to raise_error(described_class::GameNotStartedError)
+      end
+    end
+
+    context 'game is already over' do
+      let(:action) { double('action', unit: double('unit', player: white_player)) }
+
+      before do
+        allow(game_perform).to receive(:turn).and_return(10)
+        allow(game_perform).to receive(:current_player).and_return(white_player)
+        allow(game_perform).to receive(:game_over?).and_return(true)
+        allow(game_perform).to receive(:can_promote_unit?).and_return(false)
+        allow(game_perform).to receive(:allowed_actions).and_return(action)
+      end
+
+      it 'raises error' do
+        expect { game_perform.perform_action(action) }.to raise_error(described_class::GameAlreadyOverError)
+      end
+    end
+
+    context 'current player is not same as action' do
+      let(:action) { double('action', unit: double('unit', player: white_player)) }
+
+      before do
+        allow(game_perform).to receive(:turn).and_return(10)
+        allow(game_perform).to receive(:current_player).and_return(black_player)
+        allow(game_perform).to receive(:game_over?).and_return(false)
+        allow(game_perform).to receive(:can_promote_unit?).and_return(false)
+        allow(game_perform).to receive(:allowed_actions).and_return(action)
+      end
+
+      it 'raises error' do
+        expect { game_perform.perform_action(action) }.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'unit can be promoted but no unit class has been supplied' do
+      let(:action) { double('action', unit: double('unit', player: white_player)) }
+
+      before do
+        allow(game_perform).to receive(:turn).and_return(10)
+        allow(game_perform).to receive(:current_player).and_return(white_player)
+        allow(game_perform).to receive(:game_over?).and_return(false)
+        allow(game_perform).to receive(:can_promote_unit?).and_return(true)
+        allow(game_perform).to receive(:allowed_actions).and_return(action)
+        allow(action).to receive(:promoted_unit_class).and_return(nil)
+      end
+
+      it 'raises error' do
+        expect { game_perform.perform_action(action) }.to raise_error(described_class::MustPromoteError)
+      end
+    end
+
+    context 'action is not currently allowed for the unit' do
+      let(:unit) { double('unit', player: white_player, location: 'b6', symbol: '♘') }
+      let(:action) { double('action', unit: unit, location: 'h3') }
+      let(:other_action) { double('action', unit: unit) }
+
+      before do
+        allow(game_perform).to receive(:turn).and_return(10)
+        allow(game_perform).to receive(:current_player).and_return(white_player)
+        allow(game_perform).to receive(:game_over?).and_return(false)
+        allow(game_perform).to receive(:can_promote_unit?).and_return(false)
+        allow(game_perform).to receive(:allowed_actions).and_return([other_action])
+      end
+
+      it 'raises error' do
+        expect { game_perform.perform_action(action) }.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'action is allowed for the unit' do
+      let(:unit) { double('unit', player: white_player, location: 'b6', symbol: '♘') }
+      let(:action) { double('action', unit: unit, location: 'h3') }
+
+      before do
+        game_perform.instance_variable_set(:@turn, 10)
+        game_perform.instance_variable_set(:@current_player, white_player)
+        allow(game_perform).to receive(:game_over?).and_return(false)
+        allow(game_perform).to receive(:can_promote_unit?).and_return(false)
+        allow(game_perform).to receive(:allowed_actions).and_return([action])
+      end
+
+      it 'sends perform_action to action, increments the turn, and switches the player' do
+        expect(action).to receive(:perform_action).once
+        game_perform.perform_action(action)
+        expect(game_perform.turn).to eq(11)
+        expect(game_perform.current_player).to eq(black_player)
       end
     end
   end
