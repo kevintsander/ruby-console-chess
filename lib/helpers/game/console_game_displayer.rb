@@ -31,9 +31,9 @@ module ConsoleGameDisplayer
     odd_color = SQUARE_COLORS[1]
     board_string = "    a  b  c  d  e  f  g  h \n"
     # board_string = ''
-    Board::MAP.each_with_index do |location_row, row_id|
+    game.board.class::MAP.each_with_index do |location_row, row_id|
       location_row.each_with_index do |location, col_id|
-        unit_at_location = board.unit_at(location)
+        unit_at_location = game.board.unit_at(location)
         square_string = unit_at_location ? " #{unit_at_location.symbol.colorize(:black)} " : '   '
 
         board_string += " #{row_id + 1} " if col_id == 0
@@ -63,6 +63,11 @@ module ConsoleGameDisplayer
   end
 
   def display_grid
-    puts stitch_sections
+    # puts stitch_sections
+    puts board_section_string
+  end
+
+  def display_ask_player_name(color)
+    puts "Who will control the #{color} pieces? (Enter player name)"
   end
 end
