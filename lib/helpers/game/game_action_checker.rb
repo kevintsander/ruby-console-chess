@@ -51,7 +51,6 @@ module GameActionChecker
 
   def valid_en_passant_location?(en_passant_action)
     unit = en_passant_action.unit
-    move_location = en_passant_action.location
 
     return false unless unit.is_a?(Pawn)
 
@@ -63,9 +62,9 @@ module GameActionChecker
     # if last move was a pawn that moved two ranks, and it is in adjacent column, can jump behind other pawn (en passant)
     if last_unit.is_a?(Pawn) &&
        units_delta[1].abs == 1 &&
-       units_delta[0].abs == 0
-      last_move_delta[0].abs == 2 &&
-        true
+       units_delta[0].abs == 0 &&
+       last_move_delta[0].abs == 2
+      true
     else
       false
     end
