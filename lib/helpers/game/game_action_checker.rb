@@ -61,8 +61,8 @@ module GameActionChecker
     last_move_delta = board.location_delta(last_action.from_location, last_unit_location)
     # if last move was a pawn that moved two ranks, and it is in adjacent column, can jump behind other pawn (en passant)
     if last_unit.is_a?(Pawn) &&
-       units_delta[1].abs == 1 &&
-       units_delta[0].abs == 0 &&
+       units_delta[1].abs.one? &&
+       units_delta[0].abs.zero? &&
        last_move_delta[0].abs == 2
       true
     else
