@@ -5,7 +5,7 @@ require './lib/board'
 describe Board do
   let(:white_player) { double('white_player', color: :white) }
   let(:black_player) { double('black_player', color: :black) }
-  let(:game_log) { double('game_log', last_move: nil) }
+  let(:game_log) { double('game_log', last_action: nil) }
 
   describe '#unit_at' do
     subject(:board) { described_class.new(game_log) }

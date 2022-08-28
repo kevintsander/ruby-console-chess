@@ -2,7 +2,7 @@
 
 # Represents a chess move
 class ActionCommand
-  attr_reader :board, :unit, :location, :action, :captured_unit
+  attr_reader :board, :unit, :location, :action, :captured_unit, :from_location
   attr_accessor :promoted_unit_class
 
   def initialize(board, unit, location)

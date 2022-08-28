@@ -55,19 +55,17 @@ module GameActionChecker
 
     return false unless unit.is_a?(Pawn)
 
-    last_move = @game_log.last_move
-    return false unless last_move
+    return false unless last_action
 
-    last_unit = last_move[:unit]
     last_unit_location = last_unit.location
     units_delta = board.location_delta(unit.location, last_unit_location)
-    last_move_delta = board.location_delta(last_move[:last_location], last_unit_location)
+    last_move_delta = board.location_delta(last_action.from_location, last_unit_location)
     # if last move was a pawn that moved two ranks, and it is in adjacent column, can jump behind other pawn (en passant)
     if last_unit.is_a?(Pawn) &&
        units_delta[1].abs == 1 &&
-       last_move_delta[0].abs == 2 &&
-       board.file(move_location) == board.file(last_unit_location)
-      true
+       units_delta[0].abs == 0
+      last_move_delta[0].abs == 2 &&
+        true
     else
       false
     end
@@ -77,7 +75,7 @@ module GameActionChecker
     unit = action.unit
     move_location = action.location
     unit.is_a?(Pawn) &&
-      !@game_log.unit_actions(action.unit) &&
+      !unit_actions(action.unit)&.any? &&
       !board.enemy_unit_at_location?(unit, move_location) &&
       !board.unit_blocking_move?(unit, move_location)
   end
@@ -173,12 +171,8 @@ module GameActionChecker
     test = self.class.new(players)
     test.test_game = true
     test_board_units = board.units.map { |unit| unit.dup }
-    test_game_log = GameLog.new
-    test_game_log_log = game_log.log.dup
-    test_game_log.instance_variable_set(:@log, test_game_log_log)
-    test_game_log_log.each do |log_item|
-      log_item[:unit] = test_board_units.select { |unit| unit.location == log_item[:unit].loation }
-    end
+    test_game_log = game_log.map { |log_item| log_item[:action].dup }
+    test.instance_variable_set(:@game_log, test_game_log)
     test.board.clear_units.add_unit(*test_board_units)
     test
   end

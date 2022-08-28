@@ -5,7 +5,7 @@ require './lib/game'
 describe Game do
   let(:white_player) { double('white_player', color: :white) }
   let(:black_player) { double('black_player', color: :black) }
-  let(:blank_log) { double('blank_log', log: [], last_move: nil) }
+  let(:blank_log) { double('blank_log', log: [], last_action: nil) }
   let(:blank_board) { double('board', units: []) }
   subject(:blank_game) { described_class.new([white_player, black_player]) }
 
@@ -141,10 +141,12 @@ describe Game do
 
     context 'enemy pawn just moved two spaces' do
       let(:enemy_pawn_jumped_two) { Pawn.new('d4', white_player) }
-      let(:log_en_passant) { double('log_en_passant', last_move: { unit: enemy_pawn_jumped_two, last_location: 'd2' }) }
+      let(:log_en_passant) do
+        double('log_en_passant', last_action: { unit: enemy_pawn_jumped_two, last_location: 'd2' })
+      end
 
       before do
-        allow(blank_log).to receive(:last_move).and_return({ unit: enemy_pawn_jumped_two, last_location: 'd2' })
+        allow(blank_log).to receive(:last_action).and_return({ unit: enemy_pawn_jumped_two, last_location: 'd2' })
         allow(blank_log).to receive(:unit_actions)
       end
 
@@ -166,7 +168,7 @@ describe Game do
 
     context 'pawn has not moved' do
       let(:new_pawn) { Pawn.new('h7', black_player) }
-      let(:log_double) { double('game_log', last_move: nil) }
+      let(:log_double) { double('game_log', last_action: nil) }
 
       before do
         allow(blank_board).to receive(:units).and_return([new_pawn])

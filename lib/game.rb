@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require './lib/board'
-require './lib/game_log'
+# require './lib/game_log'
+require './lib/helpers/game/game_logger'
 require './lib/helpers/game/game_action_checker'
 require './lib/helpers/game/game_status_checker'
 require './lib/errors/game_errors'
@@ -9,6 +10,7 @@ require './lib/errors/game_errors'
 # Represents a Chess game
 class Game
   include GameErrors
+  include GameLogger
   include GameActionChecker
   include GameStatusChecker
 
@@ -19,7 +21,7 @@ class Game
 
   def initialize(players)
     @players = players
-    @game_log = GameLog.new
+    @game_log = []
     @board = Board.new(game_log)
   end
 
@@ -37,7 +39,7 @@ class Game
     raise GameNotStartedError if turn.zero?
     raise GameAlreadyOverError if game_over?
     raise ArgumentError, 'Only current player can perform action' if action.unit.player != current_player
-    raise MustPromoteError if can_promote_unit?(game_log.last_unit) && !action.promoted_unit_class
+    raise MustPromoteError if can_promote_unit?(last_unit) && !action.promoted_unit_class
 
     unless allowed_actions(action.unit).include?(action)
       raise ArgumentError,
@@ -45,6 +47,7 @@ class Game
     end
 
     action.perform_action
+    log_action(action)
     switch_current_player unless game_over?
     @turn += 1
   end

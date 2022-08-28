@@ -23,16 +23,12 @@ class ConsoleGame
     current_player = game.current_player
     unit = select_unit(current_player.input_unit_location) until unit
     action = select_allowed_action(unit, current_player.input_move_location) until action
-    # show_actions_display # if ConsolePlayer only
-    # get_action
-    # add_promote_unit
-    # perform_action on game
     game.perform_action(action)
   end
 
   def select_unit(location)
     unit = game.board.unit_at(location)
-    unit.player == game.current_player ? unit : nil
+    unit&.player == game.current_player ? unit : nil
   end
 
   def select_allowed_action(unit, move_location)
