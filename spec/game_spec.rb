@@ -5,20 +5,17 @@ require './lib/game'
 describe Game do
   let(:white_player) { double('white_player', color: :white) }
   let(:black_player) { double('black_player', color: :black) }
-  let(:blank_log) { double('blank_log', log: [], last_action: nil) }
   let(:blank_board) { double('board', units: []) }
   subject(:blank_game) { described_class.new([white_player, black_player]) }
 
   before do
     blank_game.instance_variable_set(:@board, blank_board)
-    blank_game.instance_variable_set(:@game_log, blank_log)
-    allow(blank_log).to receive(:log_action)
-    allow(blank_log).to receive(:unit_actions)
+    blank_game.instance_variable_set(:@game_log, [])
   end
 
   describe '#allowed_actions' do
     subject(:game_allowed) { blank_game }
-    subject(:board_allowed) { Board.new(blank_log) }
+    subject(:board_allowed) { Board.new([]) }
 
     matcher :match_locations do |check_locations, action_command_type = nil|
       match do |actions|
@@ -141,13 +138,11 @@ describe Game do
 
     context 'enemy pawn just moved two spaces' do
       let(:enemy_pawn_jumped_two) { Pawn.new('d4', white_player) }
-      let(:log_en_passant) do
-        double('log_en_passant', last_action: { unit: enemy_pawn_jumped_two, last_location: 'd2' })
-      end
 
       before do
-        allow(blank_log).to receive(:last_action).and_return({ unit: enemy_pawn_jumped_two, last_location: 'd2' })
-        allow(blank_log).to receive(:unit_actions)
+        allow(game_allowed).to receive(:last_action).and_return(double('action', unit: enemy_pawn_jumped_two,
+                                                                                 from_location: 'd2'))
+        allow(game_allowed).to receive(:unit_actions)
       end
 
       it 'adjacent pawn can en passant' do
@@ -172,7 +167,6 @@ describe Game do
 
       before do
         allow(blank_board).to receive(:units).and_return([new_pawn])
-        allow(blank_log).to receive(:unit_actions).and_return(nil)
       end
 
       it 'allowed to double move' do
@@ -187,8 +181,8 @@ describe Game do
 
       before do
         allow(blank_board).to receive(:units).and_return([moved_pawn])
-        allow(blank_log).to receive(:unit_actions).with(moved_pawn).and_return({ action: :normal_move,
-                                                                                 last_location: 'h7' })
+        allow(game_allowed).to receive(:unit_actions).with(moved_pawn).and_return({ action: :normal_move,
+                                                                                    last_location: 'h7' })
       end
 
       it 'not allowed to double move' do
@@ -202,10 +196,6 @@ describe Game do
       let(:new_pawn) { Pawn.new('h7', black_player) }
       let(:blocking_friendly) { Knight.new('h6', black_player) }
       let(:enemy_on_space) { Rook.new('h5', white_player) }
-
-      before do
-        allow(blank_log).to receive(:unit_actions).and_return(nil)
-      end
 
       it 'not allowed to double move' do
         allow(board_allowed).to receive(:units).and_return([new_pawn, blocking_friendly])
@@ -224,7 +214,7 @@ describe Game do
       let(:black_king) { King.new('e8', black_player) }
 
       before do
-        allow(blank_log).to receive(:unit_actions)
+        allow(game_allowed).to receive(:unit_actions)
         board_allowed.add_unit(white_queenside_rook, black_queenside_rook,
                                white_kingside_rook, black_kingside_rook,
                                white_king, black_king)
@@ -297,7 +287,7 @@ describe Game do
 
       before do
         board_allowed.add_unit(queenside_rook, kingside_rook, king)
-        allow(blank_log).to receive(:unit_actions).and_return({ action: :normal_move })
+        allow(game_allowed).to receive(:unit_actions).and_return({ action: :normal_move })
       end
 
       it 'cannot castle' do
@@ -315,7 +305,7 @@ describe Game do
 
   describe '#stalemate?' do
     subject(:game_stalemate) { blank_game }
-    let(:board_stalemate) { Board.new(blank_log) }
+    let(:board_stalemate) { Board.new([]) }
     let(:black_king) { King.new('a8', black_player) }
     let(:black_queen) { Queen.new('g8', black_player) }
     let(:black_rook1) { Rook.new('h8', black_player) }
@@ -352,7 +342,7 @@ describe Game do
 
   describe '#check?' do
     let(:king) { King.new('b2', white_player) }
-    let(:board_check) { Board.new(blank_log) }
+    let(:board_check) { Board.new([]) }
     subject(:game_check) { blank_game }
 
     before do
@@ -380,7 +370,7 @@ describe Game do
     let(:white_king) { King.new('h1', white_player) }
     let(:black_rook) { Rook.new('g5', black_player) }
     let(:black_knight) { Knight.new('f2', black_player) }
-    let(:board_checkmate) { Board.new(blank_log) }
+    let(:board_checkmate) { Board.new([]) }
     subject(:game_checkmate) { blank_game }
 
     before do

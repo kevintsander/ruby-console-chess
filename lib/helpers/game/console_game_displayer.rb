@@ -67,7 +67,43 @@ module ConsoleGameDisplayer
     puts board_section_string
   end
 
+  def display_available_units(player)
+    available_units = game.board.units.select do |unit|
+      allowed_actions = game.allowed_actions(unit)
+      unit.player == player && allowed_actions && allowed_actions.any?
+    end
+    full_text = 'Units with available actions:'
+    full_text = available_units.reduce(full_text) do |text, unit|
+      text += " #{unit.class.name}@#{unit.location},"
+      text
+    end
+    puts full_text.chop
+  end
+
+  def display_allowed_actions(unit)
+    full_text = ''
+    action_locations_hash(unit).each do |action_class, locations|
+      location_text = "#{action_class}:"
+      locations.each do |location|
+        location_text += " #{location},"
+      end
+      full_text += "#{location_text.chop}\n"
+    end
+    puts full_text.chomp
+  end
+
   def display_ask_player_name(color)
     puts "Who will control the #{color} pieces? (Enter player name)"
+  end
+
+  private
+
+  def action_locations_hash(unit)
+    allowed_actions = allowed_actions(unit)
+    allowed_actions.each_with_object({}) do |action, action_locations|
+      action_class = action.class.name
+      action_locations[action_class] ||= []
+      action_locations[action_class] << action.location
+    end
   end
 end

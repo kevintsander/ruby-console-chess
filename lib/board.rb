@@ -40,9 +40,9 @@ class Board
     units.select { |unit| unit.location == at_location }&.first
   end
 
-  def enemy_unit_at_location?(player, location)
+  def enemy_unit_at_location?(unit, location)
     unit_at_location = unit_at(location)
-    unit_at_location && unit_at_location.player != player
+    unit_at_location && unit_at_location.player != unit.player
   end
 
   def unit_blocking_move?(unit, to_location, ignore_unit = nil)

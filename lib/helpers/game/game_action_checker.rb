@@ -56,14 +56,16 @@ module GameActionChecker
 
     return false unless last_action
 
+    move_location = en_passant_action.location
     last_unit_location = last_unit.location
     units_delta = board.location_delta(unit.location, last_unit_location)
     last_move_delta = board.location_delta(last_action.from_location, last_unit_location)
     # if last move was a pawn that moved two ranks, and it is in adjacent column, can jump behind other pawn (en passant)
     if last_unit.is_a?(Pawn) &&
-       units_delta[1].abs.one? &&
+       units_delta[1].abs == 1 &&
        units_delta[0].abs.zero? &&
-       last_move_delta[0].abs == 2
+       last_move_delta[0].abs == 2 &&
+       board.file(move_location) == board.file(last_unit_location)
       true
     else
       false
@@ -104,7 +106,7 @@ module GameActionChecker
                     board.unit_blocking_move?(other_unit, other_unit_move_location, unit)
 
     # neither unit can have moved
-    return false if [unit, other_unit].any? { |castle_unit| @game_log.unit_actions(castle_unit) }
+    return false if [unit, other_unit].any? { |castle_unit| unit_actions(castle_unit) }
 
     # king cannot pass over space that could be attacked
     king = unit_class == King ? unit : other_unit

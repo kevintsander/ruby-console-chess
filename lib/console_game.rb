@@ -21,7 +21,9 @@ class ConsoleGame
   def play_turn
     display_grid
     current_player = game.current_player
+    display_available_units(current_player)
     unit = select_unit(current_player.input_unit_location) until unit
+    display_allowed_actions(unit)
     action = select_allowed_action(unit, current_player.input_move_location) until action
     game.perform_action(action)
   end
