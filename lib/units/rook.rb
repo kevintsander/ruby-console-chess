@@ -12,6 +12,14 @@ class Rook < Unit
     @allowed_actions_deltas[:queenside_castle] = queenside_castle_delta if queenside_start?
   end
 
+  def allowed_actions_deltas
+    @allowed_actions_deltas ||= { normal_move: rook_deltas,
+                                  normal_attack: rook_deltas }
+    @allowed_actions_deltas[:kingside_castle] ||= kingside_castle_delta if kingside_start?
+    @allowed_actions_deltas[:queenside_castle] ||= queenside_castle_delta if queenside_start?
+    @allowed_actions_deltas
+  end
+
   private
 
   def rook_deltas

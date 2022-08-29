@@ -102,7 +102,7 @@ module ConsoleGameDisplayer
   end
 
   def display_ask_which_save
-    text = 'Which save would you like to open? (enter number)\n'
+    text = "Which save would you like to open? (enter number)\n"
     Game.all_saves.each_with_index do |save, save_index|
       text += "\t#{save_index + 1}) #{Game.save_name(save)}\n"
     end
@@ -110,11 +110,15 @@ module ConsoleGameDisplayer
   end
 
   def display_ask_save_name
-    puts 'Enter a name for you save:'
+    puts 'Enter a name for the save:'
   end
 
   def display_must_be_yes_no
     puts 'Please enter Y or N.'
+  end
+
+  def clear_display
+    system('clear') || system('cls')
   end
 
   private

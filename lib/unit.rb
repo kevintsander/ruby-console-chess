@@ -8,7 +8,7 @@ class Unit
   include UnitSymbolMapper
   include LocationRankAndFile
 
-  attr_reader :location, :player, :id, :symbol, :allowed_actions_deltas
+  attr_reader :location, :player, :id, :symbol, :captured, :promoted, :allowed_actions_deltas
 
   def initialize(location, player, id = location)
     @location = location
@@ -18,6 +18,7 @@ class Unit
     @initial_location = location
     @captured = false
     @promoted = false
+    @allowed_actions_deltas = nil
   end
 
   def off_board?
@@ -62,5 +63,15 @@ class Unit
     when :black
       :-
     end
+  end
+
+  def encode_with(coder)
+    coder['location'] = location
+    coder['player'] = player
+    coder['id'] = id
+    coder['symbol'] = symbol
+    coder['initial_location'] = @initial_location
+    coder['captured'] = captured
+    coder['promoted'] = promoted
   end
 end

@@ -18,6 +18,7 @@ class ConsoleGame
   end
 
   def play_turn
+    clear_display
     display_grid
     current_player = game.current_player
     display_available_units(current_player)
@@ -104,7 +105,6 @@ class ConsoleGame
   def check_special_input(input)
     if input.upcase == 'S'
       # save
-      display_ask_save_name
       game.save_game(get_save_name)
     elsif input.upcase == 'Q'
       # quit

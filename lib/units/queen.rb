@@ -4,10 +4,10 @@ require './lib/unit'
 
 # Represents a King chess piece
 class Queen < Unit
-  def initialize(location, player, id = location)
-    super(location, player, id)
-    @allowed_actions_deltas = { normal_move: queen_deltas,
-                                normal_attack: queen_deltas }
+  def allowed_actions_deltas
+    @allowed_actions_deltas ||= { normal_move: queen_deltas,
+                                  normal_attack: queen_deltas }
+    @allowed_actions_deltas
   end
 
   private
