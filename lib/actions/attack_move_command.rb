@@ -4,6 +4,8 @@ require './lib/actions/action_command'
 
 # represents an attack move that will capture another unit
 class AttackMoveCommand < ActionCommand
+  DISPLAY_NAME = 'Attack move'
+
   def perform_moves
     captured_unit = board.unit_at(location)
     unit.move(location)

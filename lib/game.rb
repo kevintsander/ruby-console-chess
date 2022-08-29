@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require './lib/board'
-# require './lib/game_log'
 require './lib/helpers/game/game_logger'
 require './lib/helpers/game/game_action_checker'
 require './lib/helpers/game/game_status_checker'
+require './lib/helpers/game/game_file_handler'
 require './lib/errors/game_errors'
 
 # Represents a Chess game
@@ -13,6 +13,7 @@ class Game
   include GameLogger
   include GameActionChecker
   include GameStatusChecker
+  include GameFileHandler
 
   attr_reader :board, :game_log, :players, :turn, :current_player
 

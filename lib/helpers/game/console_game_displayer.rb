@@ -8,11 +8,15 @@ module ConsoleGameDisplayer
   def display_introduction
     puts <<~INTRO
       CHESS
-      Welcome to Chess, the strategy game played since the 15th century!
 
-      For each player, the battlefield contains:
-        eight pawns, two rooks, two knights, two bishops, a king and a queen.
+        Welcome to Chess, the strategy game played since the 15th century!
+
+        For each player, the battlefield contains:
+          eight pawns, two rooks, two knights, two bishops, a king and a queen.
+
+      #{'    '}
       The first player to outsmart the enemy and checkmate the opposing king will win!
+
     INTRO
   end
 
@@ -68,10 +72,7 @@ module ConsoleGameDisplayer
   end
 
   def display_available_units(player)
-    available_units = game.board.units.select do |unit|
-      allowed_actions = game.allowed_actions(unit)
-      unit.player == player && allowed_actions && allowed_actions.any?
-    end
+    available_units = game.units_with_actions(player)
     full_text = 'Units with available actions:'
     full_text = available_units.reduce(full_text) do |text, unit|
       text += " #{unit.class.name}@#{unit.location},"
@@ -82,9 +83,9 @@ module ConsoleGameDisplayer
 
   def display_allowed_actions(unit)
     full_text = ''
-    action_locations_hash(unit).each do |action_class, locations|
-      location_text = "#{action_class}:"
-      locations.each do |location|
+    action_locations_hash(unit).each do |action_display_name, locations|
+      location_text = "#{action_display_name.capitalize}:"
+      locations.sort.each do |location|
         location_text += " #{location},"
       end
       full_text += "#{location_text.chop}\n"
@@ -96,14 +97,34 @@ module ConsoleGameDisplayer
     puts "Who will control the #{color} pieces? (Enter player name)"
   end
 
+  def display_ask_load_game
+    puts 'Would you like to load an existing save? (Y/N)'
+  end
+
+  def display_ask_which_save
+    text = 'Which save would you like to open? (enter number)\n'
+    Game.all_saves.each_with_index do |save, save_index|
+      text += "\t#{save_index + 1}) #{Game.save_name(save)}\n"
+    end
+    puts text
+  end
+
+  def display_ask_save_name
+    puts 'Enter a name for you save:'
+  end
+
+  def display_must_be_yes_no
+    puts 'Please enter Y or N.'
+  end
+
   private
 
   def action_locations_hash(unit)
     allowed_actions = allowed_actions(unit)
     allowed_actions.each_with_object({}) do |action, action_locations|
-      action_class = action.class.name
-      action_locations[action_class] ||= []
-      action_locations[action_class] << action.location
+      action_display_name = action.class::DISPLAY_NAME
+      action_locations[action_display_name] ||= []
+      action_locations[action_display_name] << action.location
     end
   end
 end

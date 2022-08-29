@@ -4,6 +4,8 @@ require './lib/actions/action_command'
 
 # represents a queenside castle move
 class QueensideCastleCommand < ActionCommand
+  DISPLAY_NAME = 'Queenside castle'
+
   def perform_moves
     other_castle_unit_move_hash = board.other_castle_unit_move_hash(unit, :queenside_castle)
     other_unit = other_castle_unit_move_hash[:unit]

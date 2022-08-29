@@ -106,7 +106,7 @@ module GameActionChecker
                     board.unit_blocking_move?(other_unit, other_unit_move_location, unit)
 
     # neither unit can have moved
-    return false if [unit, other_unit].any? { |castle_unit| unit_actions(castle_unit) }
+    return false if [unit, other_unit].any? { |castle_unit| unit_actions(castle_unit)&.any? }
 
     # king cannot pass over space that could be attacked
     king = unit_class == King ? unit : other_unit
@@ -118,11 +118,17 @@ module GameActionChecker
 
   def allowed_actions(unit)
     allowed = []
-    unit.allowed_actions_deltas.each do |(action_type, deltas)|
+    # sort kingside and queenside castle first so that their moves trump standard moves
+    sorted_allowed_action_deltas = unit.allowed_actions_deltas.sort_by do |action|
+      [KingsideCastleCommand, QueensideCastleCommand].include?(action) ? 0 : 1
+    end
+
+    sorted_allowed_action_deltas.each do |(action_type, deltas)|
       action_map = actions_map[action_type]
       deltas.each do |delta|
         move_location = board.delta_location(unit.location, delta)
-        next unless move_location
+        # action locations must be unique (cannot kingside/queenside castle and standard move to same location)
+        next unless move_location && !allowed.detect { |action| action.location == move_location }
 
         action_class = action_map[:class]
         action = action_class.new(board, unit, move_location)
@@ -134,6 +140,13 @@ module GameActionChecker
       end
     end
     allowed
+  end
+
+  def units_with_actions(player)
+    board.units.select do |unit|
+      allowed_actions = allowed_actions(unit)
+      unit.player == player && allowed_actions && allowed_actions.any?
+    end
   end
 
   def action_would_cause_check?(action)

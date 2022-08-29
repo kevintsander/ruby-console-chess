@@ -30,4 +30,8 @@ class ActionCommand
     @promoted_unit = @promoted_unit_class.new(@location, unit.player)
     board.add_unit(@promoted_unit)
   end
+
+  def display_name
+    DISPLAY_NAME
+  end
 end
