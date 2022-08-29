@@ -85,6 +85,7 @@ module GameActionChecker
     unit = action.unit
     unit_class = unit.class
     return false unless [Rook, King].include?(unit_class)
+    return false if unit_actions(action.unit)&.any?
 
     castle_type = if action.is_a?(KingsideCastleCommand)
                     :kingside_castle
@@ -97,6 +98,8 @@ module GameActionChecker
 
     move_location = action.location
     other_unit = other_unit_hash[:unit]
+    return false if unit_actions(action.unit)&.any?
+
     other_unit_move_location = other_unit_hash[:move_location]
 
     # cannot be blocked or have an enemy on the move space
@@ -118,17 +121,12 @@ module GameActionChecker
 
   def allowed_actions(unit)
     allowed = []
-    # sort kingside and queenside castle first so that their moves trump standard moves
-    sorted_allowed_action_deltas = unit.allowed_actions_deltas.sort_by do |action|
-      [KingsideCastleCommand, QueensideCastleCommand].include?(action) ? 0 : 1
-    end
 
-    sorted_allowed_action_deltas.each do |(action_type, deltas)|
+    unit.allowed_actions_deltas.each do |(action_type, deltas)|
       action_map = actions_map[action_type]
       deltas.each do |delta|
         move_location = board.delta_location(unit.location, delta)
-        # action locations must be unique (cannot kingside/queenside castle and standard move to same location)
-        next unless move_location && !allowed.detect { |action| action.location == move_location }
+        next unless move_location
 
         action_class = action_map[:class]
         action = action_class.new(board, unit, move_location)

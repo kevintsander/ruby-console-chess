@@ -6,6 +6,10 @@ require './lib/actions/action_command'
 class QueensideCastleCommand < ActionCommand
   DISPLAY_NAME = 'Queenside castle'
 
+  def location_notation
+    '0-0-0'
+  end
+
   def perform_moves
     other_castle_unit_move_hash = board.other_castle_unit_move_hash(unit, :queenside_castle)
     other_unit = other_castle_unit_move_hash[:unit]

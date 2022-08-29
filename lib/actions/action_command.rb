@@ -19,6 +19,10 @@ class ActionCommand
     other.class == self.class && other.board == board && other.unit == unit && other.location == location
   end
 
+  def location_notation
+    location
+  end
+
   def perform_action
     @from_location = unit.location
     perform_moves

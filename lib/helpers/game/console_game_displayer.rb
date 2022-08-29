@@ -128,7 +128,7 @@ module ConsoleGameDisplayer
     allowed_actions.each_with_object({}) do |action, action_locations|
       action_display_name = action.class::DISPLAY_NAME
       action_locations[action_display_name] ||= []
-      action_locations[action_display_name] << action.location
+      action_locations[action_display_name] << action.location_notation
     end
   end
 end
