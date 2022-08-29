@@ -469,23 +469,6 @@ describe Game do
       end
     end
 
-    context 'unit can be promoted but no unit class has been supplied' do
-      let(:action) { double('action', unit: double('unit', player: white_player)) }
-
-      before do
-        allow(game_perform).to receive(:turn).and_return(10)
-        allow(game_perform).to receive(:current_player).and_return(white_player)
-        allow(game_perform).to receive(:game_over?).and_return(false)
-        allow(game_perform).to receive(:can_promote_unit?).and_return(true)
-        allow(game_perform).to receive(:allowed_actions).and_return(action)
-        allow(action).to receive(:promoted_unit_class).and_return(nil)
-      end
-
-      it 'raises error' do
-        expect { game_perform.perform_action(action) }.to raise_error(described_class::MustPromoteError)
-      end
-    end
-
     context 'action is not currently allowed for the unit' do
       let(:unit) { double('unit', player: white_player, location: 'b6', symbol: '♘') }
       let(:action) { double('action', unit: unit, location: 'h3') }
@@ -511,16 +494,56 @@ describe Game do
       before do
         game_perform.instance_variable_set(:@turn, 10)
         game_perform.instance_variable_set(:@current_player, white_player)
+        allow(action).to receive(:perform_action)
         allow(game_perform).to receive(:game_over?).and_return(false)
+        allow(game_perform).to receive(:turn_over?).and_return(false)
         allow(game_perform).to receive(:can_promote_unit?).and_return(false)
         allow(game_perform).to receive(:allowed_actions).and_return([action])
       end
 
-      it 'sends perform_action to action, increments the turn, and switches the player' do
+      it 'sends perform_action to action and switches the player' do
         expect(action).to receive(:perform_action).once
+        expect(game_perform).to receive(:switch_current_player).once
         game_perform.perform_action(action)
-        expect(game_perform.turn).to eq(11)
-        expect(game_perform.current_player).to eq(black_player)
+      end
+
+      context 'unit can be promoted' do
+        it 'does not switch players' do
+          other_unit = double('other_unit')
+          allow(game_perform).to receive(:last_unit).and_return(other_unit)
+          allow(game_perform).to receive(:can_promote_unit?).with(other_unit).and_return(false)
+          allow(game_perform).to receive(:can_promote_unit?).with(unit).and_return(true)
+          expect { game_perform.perform_action(action) }.not_to change { game_perform.current_player }
+        end
+      end
+
+      context 'unit cannot be promoted' do
+        it 'switches players' do
+          allow(game_perform).to receive(:can_promote_unit?).and_return(false)
+          expect { game_perform.perform_action(action) }.to change { game_perform.current_player }.to(black_player)
+        end
+      end
+
+      context 'turn is over' do
+        before do
+          allow(game_perform).to receive(:turn_over?).and_return(true)
+        end
+
+        it 'increments the turn' do
+          game_perform.perform_action(action)
+          expect(game_perform.turn).to eq(11)
+        end
+      end
+
+      context 'turn is not over' do
+        before do
+          allow(game_perform).to receive(:turn_over?).and_return(false)
+        end
+
+        it 'does not increment the turn' do
+          game_perform.perform_action(action)
+          expect(game_perform.turn).to eq(10)
+        end
       end
     end
   end

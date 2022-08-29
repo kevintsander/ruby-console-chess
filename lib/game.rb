@@ -6,6 +6,7 @@ require './lib/helpers/game/game_action_checker'
 require './lib/helpers/game/game_status_checker'
 require './lib/helpers/game/game_file_handler'
 require './lib/errors/game_errors'
+require './lib/actions/promote_command'
 
 # Represents a Chess game
 class Game
@@ -36,21 +37,36 @@ class Game
     fifty_turn_draw? || any_stalemate? || any_checkmate?
   end
 
+  def both_players_played?
+    turn_logs = game_log.select { |log_item| log_item[:turn] == turn }
+    player1_played = turn_logs&.select { |log_item| log_item[:action].player == players[0] }&.any?
+    player2_played = turn_logs&.select { |log_item| log_item[:action].player == players[1] }&.any?
+    player1_played && player2_played
+  end
+
+  def turn_over?
+    both_players_played? && !can_promote_unit?
+  end
+
   def perform_action(action)
     raise GameNotStartedError if turn.zero?
     raise GameAlreadyOverError if game_over?
-    raise ArgumentError, 'Only current player can perform action' if action.unit.player != current_player
-    raise MustPromoteError if can_promote_unit?(last_unit) && !action.promoted_unit_class
 
-    unless allowed_actions(action.unit).include?(action)
+    unit = action.unit
+    raise ArgumentError, 'Only current player can perform action' if unit.player != current_player
+    raise MustPromoteError if can_promote_unit?(last_unit) && !action.is_a?(PromoteCommand)
+
+    unless allowed_actions(unit).include?(action)
       raise ArgumentError,
-            "unit #{action.unit.symbol} cannot perform #{action.class.name} at #{action.location}"
+            "unit #{unit.symbol} cannot perform #{action.class.name} at #{action.location}"
     end
 
     action.perform_action
     log_action(action)
-    switch_current_player unless game_over?
-    @turn += 1
+    return if game_over?
+
+    switch_current_player unless can_promote_unit?(unit)
+    @turn += 1 if turn_over?
   end
 
   def new_game_units

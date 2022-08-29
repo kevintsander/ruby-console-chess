@@ -43,6 +43,20 @@ class ConsoleGame
     game.allowed_actions(unit).detect { |action| action.location_notation == move_location }
   end
 
+  def select_promoted_unit_class(unit_abbreviation)
+    check_special_input(unit_abbreviation)
+    case unit_abbreviation
+    when 'Q'
+      Queen
+    when 'R'
+      Rook
+    when 'B'
+      Bishop
+    when 'K'
+      Knight
+    end
+  end
+
   def allowed_actions(unit)
     game.allowed_actions(unit)
   end
