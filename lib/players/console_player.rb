@@ -14,6 +14,11 @@ class ConsolePlayer < Player
     gets.chomp.downcase
   end
 
+  def input_promoted_unit_class
+    display_ask_promote_class
+    gets.chomp.downcase
+  end
+
   private
 
   def display_ask_unit_location
@@ -21,6 +26,10 @@ class ConsolePlayer < Player
   end
 
   def display_ask_move_location
-    puts "#{name.capitalize}, what location would you like to move to?"
+    puts 'What location would you like to move to?'
+  end
+
+  def display_ask_promote_class
+    puts 'What unit would you like to promote your pawn to? Q=Queen, R=Rook, B=Bishop, K=Knight'
   end
 end
