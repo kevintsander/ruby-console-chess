@@ -58,6 +58,8 @@ module GameActionChecker
 
     move_location = en_passant_action.location
     last_unit_location = last_unit.location
+    return false unless last_unit_location
+
     units_delta = board.location_delta(unit.location, last_unit_location)
     last_move_delta = board.location_delta(last_action.from_location, last_unit_location)
     # if last move was a pawn that moved two ranks, and it is in adjacent column, can jump behind other pawn (en passant)
@@ -85,7 +87,7 @@ module GameActionChecker
     unit = action.unit
     unit_class = unit.class
     return false unless [Rook, King].include?(unit_class)
-    return false if unit_actions(action.unit)&.any?
+    return false if unit_actions(unit)&.any?
 
     castle_type = if action.is_a?(KingsideCastleCommand)
                     :kingside_castle
@@ -98,7 +100,7 @@ module GameActionChecker
 
     move_location = action.location
     other_unit = other_unit_hash[:unit]
-    return false if unit_actions(action.unit)&.any?
+    return false if unit_actions(other_unit)&.any?
 
     other_unit_move_location = other_unit_hash[:move_location]
 
@@ -121,6 +123,7 @@ module GameActionChecker
 
   def allowed_actions(unit)
     allowed = []
+    return allowed unless unit.location
 
     unit.allowed_actions_deltas.each do |(action_type, deltas)|
       action_map = actions_map[action_type]
@@ -168,10 +171,11 @@ module GameActionChecker
   end
 
   def can_promote_unit?(unit)
+    return false unless unit_location = unit.location
     return false unless unit.is_a?(Pawn)
 
     forward_delta = [0.send(unit.forward, 1), 0]
-    test_forward_location = board.delta_location(unit.location, forward_delta)
+    test_forward_location = board.delta_location(unit_location, forward_delta)
 
     test_forward_location ? false : true
   end

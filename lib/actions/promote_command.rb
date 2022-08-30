@@ -8,7 +8,7 @@ class PromoteCommand < ActionCommand
 
   def perform_moves
     unit.promote
-    promoted_unit = promoted_unit_class.new(unit.player, location)
+    promoted_unit = @promoted_unit_class.new(location, unit.player)
     board.add_unit(promoted_unit)
   end
 end

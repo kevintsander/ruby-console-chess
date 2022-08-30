@@ -82,6 +82,7 @@ class Board
     friendly_units(unit) do |friendly|
       next if castle_type == :kingside_castle && !friendly.kingside_start?
       next if castle_type == :queenside_castle && !friendly.is_a?(King) && !friendly.queenside_start?
+      next unless friendly.location
 
       delta = friendly.allowed_actions_deltas[castle_type]&.first
       next unless delta

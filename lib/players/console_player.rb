@@ -16,7 +16,7 @@ class ConsolePlayer < Player
 
   def input_promoted_unit_class
     display_ask_promote_class
-    gets.chomp.downcase
+    gets.chomp.upcase
   end
 
   private

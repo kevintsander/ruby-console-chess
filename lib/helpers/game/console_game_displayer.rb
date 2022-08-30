@@ -21,12 +21,15 @@ module ConsoleGameDisplayer
   end
 
   def display_game_over
+    current_player = game.current_player
+    current_player_name = current_player.name.capitalize
+    other_player_name = game.other_player(current_player).name.capitalize
     if game.fifty_turn_draw?
       puts 'DRAW! Could not determine a winner after fifty turns! It was a long and bloody battle.'
-    elsif game.checkmate?
-      puts "CHECKMATE! #{game.current_player.capitalize} overwhelmed the enemy forces and captured the king!"
-    elsif game.stalemate?
-      puts 'STALEMATE! The king was almost cornered, but got away...'
+    elsif game.any_checkmate?
+      puts "CHECKMATE! #{current_player_name} overwhelmed #{other_player_name}'s forces and captured the king!"
+    elsif game.any_stalemate?
+      puts "STALEMATE! #{current_player_name} almost cornered #{other_player_name}'s king, but they away..."
     end
   end
 

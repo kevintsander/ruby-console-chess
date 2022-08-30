@@ -26,6 +26,10 @@ class ConsoleGame
     display_allowed_actions(unit)
     action = select_allowed_action(unit, current_player.input_move_location) until action
     game.perform_action(action)
+    return unless game.can_promote_unit?(unit)
+
+    promoted_class = select_promoted_unit_class(current_player.input_promoted_unit_class) until promoted_class
+    game.perform_promote(unit, promoted_class)
   end
 
   def select_unit(location)
@@ -45,7 +49,7 @@ class ConsoleGame
 
   def select_promoted_unit_class(unit_abbreviation)
     check_special_input(unit_abbreviation)
-    case unit_abbreviation
+    case unit_abbreviation.upcase
     when 'Q'
       Queen
     when 'R'
@@ -120,7 +124,7 @@ class ConsoleGame
     if input.upcase == 'S'
       # save
       game.save_game(get_save_name)
-    elsif input.upcase == 'Q'
+    elsif input.upcase == 'X'
       # quit
       exit
     end
