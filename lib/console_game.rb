@@ -28,6 +28,8 @@ class ConsoleGame
     game.perform_action(action)
     return unless game.can_promote_unit?(unit)
 
+    clear_display
+    display_grid
     promoted_class = select_promoted_unit_class(current_player.input_promoted_unit_class) until promoted_class
     game.perform_promote(unit, promoted_class)
   end
