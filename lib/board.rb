@@ -48,6 +48,14 @@ class Board
     end
   end
 
+  def units_at_rank(rank, color, unit_class)
+    units.select do |unit|
+      rank(unit.location) == rank &&
+        unit.color == color &&
+        unit.instance_of?(unit_class)
+    end
+  end
+
   def enemy_unit_at_location?(unit, location)
     unit_at_location = unit_at(location)
     unit_at_location && unit_at_location.player != unit.player
