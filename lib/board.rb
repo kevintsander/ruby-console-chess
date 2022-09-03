@@ -40,6 +40,14 @@ class Board
     units.select { |unit| unit.location == at_location }&.first
   end
 
+  def units_at_file(file, color, unit_class)
+    units.select do |unit|
+      file(unit.location) == file &&
+        unit.color == color &&
+        unit.instance_of?(unit_class)
+    end
+  end
+
   def enemy_unit_at_location?(unit, location)
     unit_at_location = unit_at(location)
     unit_at_location && unit_at_location.player != unit.player

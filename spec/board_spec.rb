@@ -100,4 +100,85 @@ describe Board do
       expect(result).to eq({ unit: king, move_location: 'g8' })
     end
   end
+
+  describe '#units_at_file' do
+    subject(:file_board) { described_class.new(game_log) }
+
+    context 'unit(s) of specified color and type are loated at file' do
+      let(:file_unit1) { double('unit', color: :black, location: 'c8') }
+      let(:file_unit2) { double('unit', color: :black, location: 'c2') }
+
+      before do
+        allow(file_unit1).to receive(:instance_of?).and_return(true)
+        allow(file_unit2).to receive(:instance_of?).and_return(true)
+        allow(file_board).to receive(:units).and_return([file_unit1, file_unit2])
+      end
+
+      it 'returns the unit(s)' do
+        result = file_board.units_at_file('c', :black, :dummy_class)
+        expect(result).to contain_exactly(file_unit2, file_unit1)
+      end
+    end
+
+    context 'no unit at file' do
+      let(:file_unit1) { double('unit', color: :black, location: 'c8') }
+      let(:file_unit2) { double('unit', color: :black, location: 'c2') }
+
+      before do
+        allow(file_board).to receive(:units).and_return([file_unit1, file_unit2])
+      end
+
+      it 'returns empty array' do
+        result = file_board.units_at_file('d', :black, :dummy_class)
+        expect(result).to match_array([])
+      end
+    end
+
+    context 'unit of same color but different type on file' do
+      let(:file_unit1) { double('unit', color: :white, location: 'h8') }
+
+      before do
+        allow(file_unit1).to receive(:class).and_return(:dummy_class_a)
+        allow(file_board).to receive(:units).and_return([file_unit1])
+      end
+
+      it 'returns empty array' do
+        result = file_board.units_at_file('c', :white, :dummy_class_b)
+        expect(result).to match_array([])
+      end
+    end
+
+    context 'unit of same type but different color on file' do
+      let(:file_unit1) { double('unit', color: :white, location: 'h8') }
+
+      before do
+        allow(file_unit1).to receive(:class).and_return(:dummy_class)
+        allow(file_board).to receive(:units).and_return([file_unit1])
+      end
+
+      it 'returns empty array' do
+        result = file_board.units_at_file('c', :black, :dummy_class)
+        expect(result).to match_array([])
+      end
+    end
+  end
+
+  describe '#units_at_rank' do
+    context 'unit(s) of specified color and type are loated at rank' do
+      xit 'returns the unit' do
+      end
+    end
+    context 'no unit at rank' do
+      xit 'returns nil' do
+      end
+    end
+    context 'unit of same color but different type on rank' do
+      xit 'returns nil' do
+      end
+    end
+    context 'unit of same type but different color on rank' do
+      xit 'returns nil' do
+      end
+    end
+  end
 end
