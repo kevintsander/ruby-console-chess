@@ -61,7 +61,7 @@ class Game
     raise ArgumentError, 'Only current player can perform action' if unit.player != current_player
 
     is_promote_command = action.is_a?(PromoteCommand)
-    raise MustPromoteError if can_promote_unit?(last_unit) && !is_promote_command
+    raise MustPromoteError if last_unit && can_promote_unit?(last_unit) && !is_promote_command
 
     unless is_promote_command || allowed_actions(unit).include?(action)
       raise ArgumentError,

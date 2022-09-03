@@ -52,26 +52,10 @@ module ConsoleGameDisplayer
     board_string
   end
 
-  def white_off_board_section; end
-
-  def black_off_board_section; end
-
-  def history_section; end
-
-  def actions_section; end
-
-  def stitch_sections
-    # overall fixed size (need to determine)
-    # top left square
-    # top half black off board
-    # bottom half white off board
-    # history to right
-    # allowed moves on bottom - allowed to grow vertically
-  end
-
   def display_grid
     # puts stitch_sections
     puts board_section_string
+    puts '    (S = Save, X = Exit)'
   end
 
   def display_available_units(player)
