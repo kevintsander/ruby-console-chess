@@ -15,15 +15,30 @@ module GameFileHandler
       File.delete(all_saves.first)
     end
 
+    def all_pgns
+      Dir["#{SAVE_DIR}/*.pgn"].sort_by { |save| File::Stat.new(save).ctime }
+    end
+
     def all_saves
       Dir["#{SAVE_DIR}/*.yaml"].sort_by { |save| File::Stat.new(save).ctime }
     end
 
-    def load_by_id(id)
-      load(all_saves[id - 1])
+    def load_save_by_id(id)
+      load_save(all_saves[id - 1])
     end
 
-    def load(path)
+    def load_pgn_by_id(id)
+      load_pgn(all_pgns[id - 1])
+    end
+
+    def load_pgn(path)
+      raise ArgumentError "#{path} doesn't exist" unless File.exist?(path)
+      raise ArgumentError "#{path} is not a PGN file" unless File.extname(path) == '.pgn'
+
+      File.read(path)
+    end
+
+    def load_save(path)
       raise ArgumentError "#{path} doesn't exist" unless all_saves.include?(path)
 
       file = File.read(path)
@@ -31,11 +46,11 @@ module GameFileHandler
     end
 
     def save_exists?(save_name)
-      all_saves.map { |save| self.class.save_name(save) }.include?(save_name)
+      all_saves.map { |save| self.class.file_name(save) }.include?(save_name)
     end
 
-    def save_name(path)
-      File.basename(path, '.yaml')
+    def file_name(path)
+      File.basename(path, '.*')
     end
   end
 

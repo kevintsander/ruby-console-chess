@@ -4,7 +4,7 @@ require 'colorize'
 
 SQUARE_COLORS = %i[on_light_blue on_light_black].freeze
 
-module ConsoleGameDisplayer
+module ConsoleGameOutputs
   def display_introduction
     puts <<~INTRO
       CHESS
@@ -70,7 +70,7 @@ module ConsoleGameDisplayer
 
   def display_allowed_actions(unit)
     full_text = ''
-    action_locations_hash(unit).each do |action_display_name, locations|
+    action_locations_display_hash(unit).each do |action_display_name, locations|
       location_text = "#{action_display_name.capitalize}:"
       locations.sort.each do |location|
         location_text += " #{location},"
@@ -91,13 +91,25 @@ module ConsoleGameDisplayer
   def display_ask_which_save
     text = "Which save would you like to open? (enter number)\n"
     Game.all_saves.each_with_index do |save, save_index|
-      text += "\t#{save_index + 1}) #{Game.save_name(save)}\n"
+      text += "\t#{save_index + 1}) #{Game.file_name(save)}\n"
     end
     puts text
   end
 
-  def display_ask_file_path
-    puts 'Enter the file path'
+  def display_ask_which_pgn
+    text = "Load a recent PGN file or enter a file path:\n"
+    Game.all_pgns.each_with_index do |pgn, pgn_index|
+      text += "\t#{pgn_index + 1}) #{Game.file_name(pgn)}\n"
+    end
+    puts text
+  end
+
+  def display_file_load_error(message)
+    puts "Could not load file: #{message}"
+  end
+
+  def display_pgn_interpreter_error
+    puts 'Could not interpret PGN file.'
   end
 
   def display_ask_save_name
@@ -110,7 +122,7 @@ module ConsoleGameDisplayer
 
   private
 
-  def action_locations_hash(unit)
+  def action_locations_display_hash(unit)
     allowed_actions = allowed_actions(unit)
     allowed_actions.each_with_object({}) do |action, action_locations|
       action_display_name = action.class::DISPLAY_NAME

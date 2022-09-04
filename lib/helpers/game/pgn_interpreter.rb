@@ -34,8 +34,8 @@ class PgnInterpreter
                       { abbrev: 'R', class: Rook },
                       { abbrev: 'N', class: Knight }].freeze
 
-  def initialize(pgn_filepath)
-    @pgn_data = File.read(pgn_filepath)
+  def initialize(pgn_data)
+    @pgn_data = pgn_data
   end
 
   def tags
