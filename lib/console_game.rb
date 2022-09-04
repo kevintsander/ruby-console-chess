@@ -2,7 +2,9 @@
 
 require './lib/game'
 require './lib/players/console_player'
+require './lib/players/pgn_player'
 require './lib/helpers/game/console_game_displayer'
+require './lib/helpers/game/pgn_interpreter'
 
 # Represents a Chess game to be played in the console
 class ConsoleGame
@@ -93,31 +95,60 @@ class ConsoleGame
     return input if Game.all_saves.size >= input
   end
 
+  def get_pgn_file_path
+    display_ask_file_path
+    gets.chomp
+  end
+
   def get_save_name
     display_ask_save_name
     gets.chomp
   end
 
+  def get_game_start_action
+    display_ask_game_start_action
+    action = gets.chomp
+    %w[1 2 3].include?(action) ? action : nil
+  end
+
   def initialize_game
-    display_ask_load_game
-    if Game.all_saves.any? && get_yes_no == 'Y'
+    start_action = get_game_start_action until start_action
+    case start_action
+    when '1'
+      @game = game.new(create_players)
+      @game.start
+    when '2'
       save_id = get_save_id until save_id
       @game = Game.load_by_id(save_id)
-    else
-      @game = Game.new(create_players)
-      game.start
+    when '3'
+      pgn_path = get_pgn_file_path
+      @game = Game.new
+      @game.add_players(create_pgn_players(pgn_path, @game))
+      @game.start
     end
   end
 
-  def create_players
-    white_player = create_player(:white)
-    black_player = create_player(:black)
+  def create_console_players
+    white_player = create_console_player(:white)
+    black_player = create_console_player(:black)
     [white_player, black_player]
   end
 
-  def create_player(color)
+  def create_console_player(color)
     name = get_player_name(color)
     ConsolePlayer.new(name, color)
+  end
+
+  def create_pgn_players(pgn_path, game)
+    interpreter = PgnInterpreter.new(pgn_path)
+    white_player_name = interpreter.white_player_name
+    black_player_name = interpreter.black_player_name
+    turns = interpreter.turns
+    white_player_moves = turns.map { |turn| turn[:white] }
+    black_player_moves = turns.map { |turn| turn[:black] }
+    white_player = PgnPlayer.new(white_player_name, :white, game, white_player_moves)
+    black_player = PgnPlayer.new(black_player_name, :black, game, black_player_moves)
+    [white_player, black_player]
   end
 
   private

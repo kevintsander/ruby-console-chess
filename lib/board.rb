@@ -42,16 +42,18 @@ class Board
 
   def units_at_file(file, color, unit_class)
     units.select do |unit|
-      file(unit.location) == file &&
-        unit.color == color &&
+      !unit.off_board? &&
+        file(unit.location) == file &&
+        unit.player.color == color &&
         unit.instance_of?(unit_class)
     end
   end
 
   def units_at_rank(rank, color, unit_class)
     units.select do |unit|
-      rank(unit.location) == rank &&
-        unit.color == color &&
+      !unit.off_board? &&
+        rank(unit.location) == rank &&
+        unit.player.color == color &&
         unit.instance_of?(unit_class)
     end
   end

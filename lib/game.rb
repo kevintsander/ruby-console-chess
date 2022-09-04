@@ -21,10 +21,14 @@ class Game
   @current_player = nil
   @turn = 0
 
-  def initialize(players)
+  def initialize(players = [])
     @players = players
     @game_log = []
     @board = Board.new(game_log)
+  end
+
+  def add_players(players)
+    @players = players
   end
 
   def start
