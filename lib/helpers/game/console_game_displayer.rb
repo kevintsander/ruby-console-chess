@@ -84,8 +84,8 @@ module ConsoleGameDisplayer
     puts "Who will control the #{color} pieces? (Enter player name)"
   end
 
-  def display_ask_load_game
-    puts 'Would you like to load an existing save? (Y/N)'
+  def display_ask_game_start_action
+    puts '1 = New Game   2 = Load game   3 = Load PGN File'
   end
 
   def display_ask_which_save
@@ -96,12 +96,12 @@ module ConsoleGameDisplayer
     puts text
   end
 
-  def display_ask_save_name
-    puts 'Enter a name for the save:'
+  def display_ask_file_path
+    puts 'Enter the file path'
   end
 
-  def display_must_be_yes_no
-    puts 'Please enter Y or N.'
+  def display_ask_save_name
+    puts 'Enter a name for the save:'
   end
 
   def clear_display

@@ -7,7 +7,7 @@ class QueensideCastleCommand < ActionCommand
   DISPLAY_NAME = 'Queenside castle'
 
   def location_notation
-    '0-0-0'
+    'O-O-O'
   end
 
   def perform_moves
