@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require './lib/actions/action_command'
+require './lib/action_command'
 
 # represents a kingside castle command
 class KingsideCastleCommand < ActionCommand
