@@ -30,6 +30,6 @@ class ConsolePlayer < Player
   end
 
   def display_ask_promote_class
-    puts 'What unit would you like to promote your pawn to? Q=Queen, R=Rook, B=Bishop, K=Knight'
+    puts 'What unit would you like to promote your pawn to?\nQ = Queen   R = Rook   B = Bishop   N = Knight'
   end
 end

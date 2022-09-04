@@ -14,7 +14,7 @@ class PgnPlayer < Player
   end
 
   def input_unit_location
-    check_auto_move_type
+    check_auto_move_type unless check_fast_forward
     # check board status to find unit that can move to the location
     @current_move = @moves.shift
     file = @current_move[:unit_file]
@@ -30,10 +30,12 @@ class PgnPlayer < Player
   end
 
   def input_move_location
+    check_fast_forward
     @current_move[:move]
   end
 
   def input_promoted_unit_class
+    check_fast_forward
     @current_move[:promoted_unit_class]
   end
 
@@ -56,15 +58,20 @@ class PgnPlayer < Player
     puts "#{name} is up.\nN = Next   FF = Fast Forward"
   end
 
-  def check_auto_move_type
-    return unless @fast_forward == false
+  def check_fast_forward
+    return unless @fast_forward
 
+    sleep(0.5)
+    true
+  end
+
+  def check_auto_move_type
     type = ''
     until %w[N FF].include?(type)
       display_ask_auto_move_type
       type = gets.chomp.upcase
     end
-    @fast_forward == true if type == 'FF'
+    @fast_forward = true if type == 'FF'
     type
   end
 
