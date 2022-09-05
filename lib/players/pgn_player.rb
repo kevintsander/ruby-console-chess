@@ -22,7 +22,7 @@ class PgnPlayer < Player
 
   def input_unit_location
     # submit draw if no more moves (but game isnt over)
-    return '=' if @moves.none?
+    return 'D' if @moves.none?
 
     check_auto_move_type unless check_fast_forward
     # check board status to find unit that can move to the location

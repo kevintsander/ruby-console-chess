@@ -80,19 +80,19 @@ module ConsoleGameOutputs
   def display_grid_available_units
     clear_display
     puts add_dynamic_section_to_grid(available_units_section)
-    puts '    (D = Draw, S = Save, X = Exit)' if game.current_player.is_a?(ConsolePlayer)
+    puts '(D = Draw, S = Save, X = Exit)' if game.current_player.is_a?(ConsolePlayer)
   end
 
   def display_grid_allowed_actions(unit)
     clear_display
     puts add_dynamic_section_to_grid(allowed_actions_section(unit))
-    puts '    (S = Save, X = Exit)' if game.current_player.is_a?(ConsolePlayer)
+    puts '(S = Save, X = Exit)' if game.current_player.is_a?(ConsolePlayer)
   end
 
   def display_grid_promote_unit
     clear_display
     puts add_dynamic_section_to_grid(promote_unit_section)
-    puts '    (S = Save, X = Exit)' if game.current_player.is_a?(ConsolePlayer)
+    puts '(S = Save, X = Exit)' if game.current_player.is_a?(ConsolePlayer)
   end
 
   def display_grid_game_over
@@ -114,7 +114,7 @@ module ConsoleGameOutputs
                          line.to_s
                        end
     end
-    puts stitched_grid.chomp
+    stitched_grid.chomp
   end
 
   def game_turn_section
