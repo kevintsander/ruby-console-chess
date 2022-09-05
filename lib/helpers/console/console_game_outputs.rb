@@ -22,9 +22,15 @@ module ConsoleGameOutputs
 
   def game_over_section
     current_player = game.current_player
-    current_player_name = current_player.name.capitalize
-    other_player_name = game.other_player(current_player).name.capitalize
-    if game.fifty_turn_draw?
+    current_player_name = current_player.name
+    other_player_name = game.other_player(current_player).name
+    if game.player_draw
+      <<~DRAW
+
+        DRAW!#{' '}
+        Players agreed to lay down their arms.
+      DRAW
+    elsif game.fifty_turn_draw?
       <<~DRAW
 
         DRAW!
@@ -48,6 +54,10 @@ module ConsoleGameOutputs
     end
   end
 
+  def promote_unit_section
+    'SELECT A UNIT TO PROMOTE'.underline + "\nQ = Queen\nB = Bishop\nR = Rook\nN = Knight"
+  end
+
   def board_section_string
     even_color = SQUARE_COLORS[0]
     odd_color = SQUARE_COLORS[1]
@@ -67,26 +77,27 @@ module ConsoleGameOutputs
     board_string
   end
 
-  def display_grid
-    # puts stitch_sections
-    puts board_section_string
-    puts '    (S = Save, X = Exit)'
-  end
-
   def display_grid_available_units
+    clear_display
     puts add_dynamic_section_to_grid(available_units_section)
   end
 
   def display_grid_allowed_actions(unit)
+    clear_display
     puts add_dynamic_section_to_grid(allowed_actions_section(unit))
   end
 
+  def display_grid_promote_unit
+    clear_display
+    puts add_dynamic_section_to_grid(promote_unit_section)
+  end
+
   def display_grid_game_over
+    clear_display
     puts add_dynamic_section_to_grid(game_over_section)
   end
 
   def add_dynamic_section_to_grid(section)
-    clear_display
     stitched_grid = ''
     section_lines = section.split("\n")
     board_section_string.each_line.with_index do |line, index|
@@ -101,6 +112,7 @@ module ConsoleGameOutputs
                        end
     end
     puts stitched_grid
+    puts '    (S = Save, X = Exit)' if game.current_player.is_a?(ConsolePlayer)
   end
 
   def game_turn_section
@@ -108,6 +120,7 @@ module ConsoleGameOutputs
   end
 
   def game_status_section
+    text = 'DRAW'.on_yellow if game.player_draw || game.fifty_turn_draw?
     text = 'CHECK'.on_yellow if game.any_check?
     text = 'CHECKMATE'.on_red if game.any_checkmate?
     text = 'STALEMATE'.on_red if game.any_stalemate?
@@ -116,7 +129,7 @@ module ConsoleGameOutputs
 
   def available_units_section
     available_units = game.units_with_actions(game.current_player)
-    full_text = "UNITS WITH AVAILABLE ACTIONS:\n"
+    full_text = 'UNITS WITH AVAILABLE ACTIONS'.underline + "\n"
     grouped_units = available_units.group_by { |unit| unit.class }
     full_text = grouped_units.reduce(full_text) do |units_text, (unit_class, units)|
       unit_class_text = "#{unit_class}:".ljust(7, ' ')
@@ -130,10 +143,12 @@ module ConsoleGameOutputs
   end
 
   def allowed_actions_section(unit)
-    full_text = "AVAILABLE ACTIONS:\n"
+    full_text = "AVAILABLE ACTIONS FOR #{unit.class.name.upcase} (#{unit.location}):".underline + "\n"
     action_locations_display_hash(unit).each do |action_display_name, locations|
       location_text = "  #{action_display_name.capitalize}:"
+      action_header_length = location_text.size
       locations.sort.each do |location|
+        location_text += "\n#{' ' * action_header_length}" if location_text.split("\n").last.size >= 40
         location_text += " #{location},"
       end
       full_text += "#{location_text.chop}\n"

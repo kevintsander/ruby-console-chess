@@ -16,10 +16,12 @@ class Game
   include GameStatusChecker
   include GameFileHandler
 
-  attr_reader :board, :game_log, :players, :turn, :current_player
+  attr_reader :board, :game_log, :players, :turn, :current_player, :player_draw
 
   @current_player = nil
   @turn = 0
+  @player_draw = false
+  @pgn_fast_forward = false
 
   def initialize(players = [])
     @players = players
@@ -38,7 +40,11 @@ class Game
   end
 
   def game_over?
-    turn&.positive? && (fifty_turn_draw? || any_stalemate? || any_checkmate?)
+    turn&.positive? && (player_draw || fifty_turn_draw? || any_stalemate? || any_checkmate?)
+  end
+
+  def submit_draw
+    @player_draw = true
   end
 
   def both_players_played?

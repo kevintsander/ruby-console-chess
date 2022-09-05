@@ -22,15 +22,15 @@ class ConsoleGame
   end
 
   def play_turn
-    clear_display
-    display_grid
-    unit = select_unit(get_unit_location) until unit
+    unit_location = get_unit_location
+    return if check_player_draw(unit_location)
+
+    unit = select_unit(unit_location) until unit
     action = select_allowed_action(unit, get_action_location(unit)) until action
     game.perform_action(action)
     return unless game.can_promote_unit?(unit)
 
-    clear_display
-    display_grid
+    display_grid_promote_unit
     promoted_class = select_promoted_unit_class(get_promoted_unit_abbreviation) until promoted_class
     game.perform_promote(unit, promoted_class)
   end
@@ -50,6 +50,11 @@ class ConsoleGame
 
   def select_promoted_unit_class(unit_abbreviation)
     { 'Q' => Queen, 'R' => Rook, 'B' => Bishop, 'N' => Knight }[unit_abbreviation.upcase]
+  end
+
+  def check_player_draw(input)
+    game.submit_draw if input == '='
+    game.player_draw
   end
 
   def allowed_actions(unit)

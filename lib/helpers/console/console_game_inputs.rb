@@ -3,7 +3,7 @@
 module ConsoleGameInputs
   def get_player_name(color)
     display_ask_player_name(color)
-    name = gets.chomp.capitalize
+    name = gets.chomp
     check_initialize_menu_special_input(name)
     name
   end
