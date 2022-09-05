@@ -27,6 +27,7 @@ class Game
     @players = players
     @game_log = []
     @board = Board.new(game_log)
+    @allowed_actions_cache = {}
   end
 
   def add_players(players)
@@ -79,6 +80,7 @@ class Game
     end
 
     action.perform_action
+    @allowed_actions_cache = {} # reset allowed actions cache
     log_action(action)
     return if game_over?
 

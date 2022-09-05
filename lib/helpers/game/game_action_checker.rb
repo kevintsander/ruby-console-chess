@@ -121,26 +121,31 @@ module GameActionChecker
     true
   end
 
+  @allowed_actions_cache = {}
   def allowed_actions(unit)
-    allowed = []
-    return allowed unless unit.location
+    allowed_actions_cached = @allowed_actions_cache[unit]
+    unless allowed_actions_cached
+      allowed = []
+      return allowed unless unit.location
 
-    unit.allowed_actions_deltas.each do |(action_type, deltas)|
-      action_map = actions_map[action_type]
-      deltas.each do |delta|
-        move_location = board.delta_location(unit.location, delta)
-        next unless move_location
+      unit.allowed_actions_deltas.each do |(action_type, deltas)|
+        action_map = actions_map[action_type]
+        deltas.each do |delta|
+          move_location = board.delta_location(unit.location, delta)
+          next unless move_location
 
-        action_class = action_map[:class]
-        action = action_class.new(board, unit, move_location)
+          action_class = action_map[:class]
+          action = action_class.new(board, unit, move_location)
 
-        next unless action_map[:validator].call(action)
-        next if action_would_cause_check?(action)
+          next unless action_map[:validator].call(action)
+          next if action_would_cause_check?(action)
 
-        allowed << action
+          allowed << action
+        end
       end
+      @allowed_actions_cache[unit] = allowed
     end
-    allowed
+    @allowed_actions_cache[unit]
   end
 
   def units_with_actions(player)

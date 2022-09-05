@@ -77,7 +77,7 @@ module ConsoleGameInputs
   private
 
   def check_player_draw(input)
-    game.submit_draw if input == '='
+    game.submit_draw if input == 'D'
     game.player_draw
   end
 

@@ -118,7 +118,8 @@ module ConsoleGameOutputs
   end
 
   def game_turn_section
-    "Turn: #{game.turn.to_s.ljust(2, ' ')}\tPlayer: #{game.current_player.name}"
+    current_player = game.current_player
+    "Turn: #{game.turn.to_s.ljust(2, ' ')}\tPlayer: #{current_player.name.colorize(background: current_player.color)}"
   end
 
   def game_status_section
