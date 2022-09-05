@@ -38,7 +38,7 @@ class Game
   end
 
   def game_over?
-    fifty_turn_draw? || any_stalemate? || any_checkmate?
+    turn&.positive? && (fifty_turn_draw? || any_stalemate? || any_checkmate?)
   end
 
   def both_players_played?

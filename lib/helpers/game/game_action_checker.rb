@@ -155,16 +155,17 @@ module GameActionChecker
       return false
     end # for test game, do not perform this check because we need to test if moves would cause check
 
-    # create a test game with the king off board (to )
+    # create a test game
     new_test_game = get_test_game_copy
     new_test_game_units = new_test_game.board.units
-    test_unit = new_test_game_units.detect { |test_unit| test_unit.location == action.unit.location }
-    test_friendly_king = new_test_game_units.detect do |test_unit|
-      test_unit.is_a?(King) && test_unit.player == action.unit.player
+    test_unit = new_test_game_units.detect { |unit| unit.location == action.unit.location }
+    test_friendly_king = new_test_game_units.detect do |unit|
+      unit.is_a?(King) && unit.player == action.unit.player
     end
 
     # get a copy of the action to test
     test_action = action.class.new(new_test_game.board, test_unit, action.location)
+
     test_action.perform_action
 
     new_test_game.check?(test_friendly_king)

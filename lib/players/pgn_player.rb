@@ -61,7 +61,7 @@ class PgnPlayer < Player
   def check_fast_forward
     return unless @fast_forward
 
-    sleep(0.5)
+    # sleep(0.01)
     true
   end
 

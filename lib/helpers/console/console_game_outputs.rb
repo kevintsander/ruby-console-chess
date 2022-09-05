@@ -20,16 +20,31 @@ module ConsoleGameOutputs
     INTRO
   end
 
-  def display_game_over
+  def game_over_section
     current_player = game.current_player
     current_player_name = current_player.name.capitalize
     other_player_name = game.other_player(current_player).name.capitalize
     if game.fifty_turn_draw?
-      puts 'DRAW! Could not determine a winner after fifty turns! It was a long and bloody battle.'
+      <<~DRAW
+
+        DRAW!
+        Coult not determine a winner after fifty turns!
+        It was a long and bloody battle...
+      DRAW
     elsif game.any_checkmate?
-      puts "CHECKMATE! #{current_player_name} overwhelmed #{other_player_name}'s forces and captured the king!"
+      <<~CHECKMATE
+
+        CHECKMATE!
+        #{current_player_name} overwhelmed #{other_player_name}'s forces
+        and captured the King!
+      CHECKMATE
     elsif game.any_stalemate?
-      puts "STALEMATE! #{current_player_name} almost cornered #{other_player_name}'s king, but they away..."
+      <<~STALEMATE
+
+        STALEMATE!
+        #{current_player_name} almost cornerered #{other_player_name}'s king,
+        but they managed to escape...
+      STALEMATE
     end
   end
 
@@ -58,26 +73,72 @@ module ConsoleGameOutputs
     puts '    (S = Save, X = Exit)'
   end
 
-  def display_available_units(player)
-    available_units = game.units_with_actions(player)
-    full_text = 'Units with available actions:'
-    full_text = available_units.reduce(full_text) do |text, unit|
-      text += " #{unit.class.name}@#{unit.location},"
-      text
-    end
-    puts full_text.chop
+  def display_grid_available_units
+    puts add_dynamic_section_to_grid(available_units_section)
   end
 
-  def display_allowed_actions(unit)
-    full_text = ''
+  def display_grid_allowed_actions(unit)
+    puts add_dynamic_section_to_grid(allowed_actions_section(unit))
+  end
+
+  def display_grid_game_over
+    puts add_dynamic_section_to_grid(game_over_section)
+  end
+
+  def add_dynamic_section_to_grid(section)
+    clear_display
+    stitched_grid = ''
+    section_lines = section.split("\n")
+    board_section_string.each_line.with_index do |line, index|
+      stitched_grid += if index.zero?
+                         "#{line.chomp} | #{game_turn_section}\n"
+                       elsif index.between?(1, 7)
+                         "#{line.chomp} | #{section_lines[index - 1]}\n"
+                       elsif index == 8
+                         "#{line.chomp} | #{game_status_section}\n"
+                       else
+                         line.to_s
+                       end
+    end
+    puts stitched_grid
+  end
+
+  def game_turn_section
+    "Turn: #{game.turn.to_s.ljust(2, ' ')}\tPlayer: #{game.current_player.name}"
+  end
+
+  def game_status_section
+    text = 'CHECK'.on_yellow if game.any_check?
+    text = 'CHECKMATE'.on_red if game.any_checkmate?
+    text = 'STALEMATE'.on_red if game.any_stalemate?
+    text
+  end
+
+  def available_units_section
+    available_units = game.units_with_actions(game.current_player)
+    full_text = "UNITS WITH AVAILABLE ACTIONS:\n"
+    grouped_units = available_units.group_by { |unit| unit.class }
+    full_text = grouped_units.reduce(full_text) do |units_text, (unit_class, units)|
+      unit_class_text = "#{unit_class}:".ljust(7, ' ')
+      units_text += "  #{unit_class_text}"
+      units_text = units.reduce(units_text) do |class_text, unit|
+        class_text + " #{unit.location},"
+      end
+      "#{units_text.chop}\n"
+    end
+    full_text.chomp
+  end
+
+  def allowed_actions_section(unit)
+    full_text = "AVAILABLE ACTIONS:\n"
     action_locations_display_hash(unit).each do |action_display_name, locations|
-      location_text = "#{action_display_name.capitalize}:"
+      location_text = "  #{action_display_name.capitalize}:"
       locations.sort.each do |location|
         location_text += " #{location},"
       end
       full_text += "#{location_text.chop}\n"
     end
-    puts full_text.chomp
+    full_text.chomp
   end
 
   def display_ask_player_name(color)
