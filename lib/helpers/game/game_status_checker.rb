@@ -6,7 +6,18 @@ module GameStatusChecker
   end
 
   def checkmate?(king)
-    king.is_a?(King) & check?(king) & !allowed_actions(king)&.any?
+    king.is_a?(King) && check?(king) && !friendly_units_have_moves(king) && allowed_actions(king).none?
+  end
+
+  def friendly_units_have_moves(unit)
+    board.friendly_units(unit).any? do |friendly|
+      allowed_actions = allowed_actions(friendly)
+      allowed_actions&.any?
+    end
+  end
+
+  def any_check?
+    board.units.any? { |unit| unit.is_a?(King) && check?(unit) }
   end
 
   def any_checkmate?
@@ -14,11 +25,7 @@ module GameStatusChecker
   end
 
   def stalemate?(king)
-    return false unless king.is_a?(King)
-    return false if check?(king)
-    return false if board.friendly_units(king).any? { |unit| allowed_actions(unit)&.any? }
-
-    true
+    king.is_a?(King) && !check?(king) && !friendly_units_have_moves(king) && allowed_actions(king).none?
   end
 
   def any_stalemate?

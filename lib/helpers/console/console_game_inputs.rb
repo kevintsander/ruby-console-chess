@@ -3,27 +3,28 @@
 module ConsoleGameInputs
   def get_player_name(color)
     display_ask_player_name(color)
-    name = gets.chomp.capitalize
+    name = gets.chomp
     check_initialize_menu_special_input(name)
     name
   end
 
-  def get_unit_location(current_player)
-    display_available_units(current_player)
-    location = current_player.input_unit_location
+  def get_unit_location
+    display_grid_available_units
+    location = game.current_player.input_unit_location
+    check_turn_menu_inputs(location)
+
+    location
+  end
+
+  def get_action_location(unit)
+    display_grid_allowed_actions(unit)
+    location = game.current_player.input_move_location
     check_turn_menu_inputs(location)
     location
   end
 
-  def get_action_location(current_player, unit)
-    display_allowed_actions(unit)
-    location = current_player.input_move_location
-    check_turn_menu_inputs(location)
-    location
-  end
-
-  def get_promoted_unit_abbreviation(current_player)
-    class_abbrev = current_player.input_promoted_unit_class
+  def get_promoted_unit_abbreviation
+    class_abbrev = game.current_player.input_promoted_unit_class
     check_turn_menu_inputs(class_abbrev)
     class_abbrev
   end
@@ -74,6 +75,11 @@ module ConsoleGameInputs
   end
 
   private
+
+  def check_player_draw(input)
+    game.submit_draw if input == 'D'
+    game.player_draw
+  end
 
   def check_turn_menu_inputs(input)
     if input.upcase == 'S'

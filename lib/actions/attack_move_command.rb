@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require './lib/actions/action_command'
+require './lib/action_command'
 
 # represents an attack move that will capture another unit
 class AttackMoveCommand < ActionCommand

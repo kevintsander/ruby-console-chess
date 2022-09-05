@@ -104,9 +104,10 @@ describe Board do
   describe '#units_at_file' do
     subject(:file_board) { described_class.new(game_log) }
 
-    context 'unit(s) of specified color and type are loated at file' do
-      let(:file_unit1) { double('unit', color: :black, location: 'c8') }
-      let(:file_unit2) { double('unit', color: :black, location: 'c2') }
+    context 'unit(s) of specified color and type are located at file' do
+      let(:player) { double('player', color: :black) }
+      let(:file_unit1) { double('unit', location: 'c8', off_board?: false, player: player) }
+      let(:file_unit2) { double('unit', location: 'c2', off_board?: false, player: player) }
 
       before do
         allow(file_unit1).to receive(:instance_of?).and_return(true)
@@ -121,8 +122,9 @@ describe Board do
     end
 
     context 'no unit at file' do
-      let(:file_unit1) { double('unit', color: :black, location: 'c8') }
-      let(:file_unit2) { double('unit', color: :black, location: 'c2') }
+      let(:player) { double('player', color: :black) }
+      let(:file_unit1) { double('unit', location: 'c8', off_board?: false, player: player) }
+      let(:file_unit2) { double('unit', location: 'c2', off_board?: false, player: player) }
 
       before do
         allow(file_board).to receive(:units).and_return([file_unit1, file_unit2])
@@ -135,8 +137,9 @@ describe Board do
     end
 
     context 'unit of same color but different type on file' do
-      let(:file_unit1) { double('unit', color: :white, location: 'h8') }
-      let(:file_unit2) { double('unit', color: :white, location: 'h3') }
+      let(:player) { double('player', color: :white) }
+      let(:file_unit1) { double('unit', location: 'h8', off_board?: false, player: player) }
+      let(:file_unit2) { double('unit', location: 'h3', off_board?: false, player: player) }
 
       before do
         allow(file_unit1).to receive(:instance_of?).and_return(false)
@@ -151,9 +154,11 @@ describe Board do
     end
 
     context 'unit of same type but different color on file' do
-      let(:file_unit1) { double('unit', color: :white, location: 'h8') }
+      let(:player1) { double('player1', color: :white) }
+      let(:file_unit1) { double('unit', location: 'h8', off_board?: false, player: player1) }
 
       before do
+        allow(file_board).to receive(:units).and_return([file_unit1])
         allow(file_board).to receive(:units).and_return([file_unit1])
       end
 
@@ -168,8 +173,9 @@ describe Board do
     subject(:rank_board) { described_class.new(game_log) }
 
     context 'unit(s) of specified color and type are loated at rank' do
-      let(:rank_unit1) { double('unit', color: :black, location: 'e2') }
-      let(:rank_unit2) { double('unit', color: :black, location: 'c2') }
+      let(:player) { double('player', color: :black) }
+      let(:rank_unit1) { double('unit', location: 'e2', off_board?: false, player: player) }
+      let(:rank_unit2) { double('unit', location: 'c2', off_board?: false, player: player) }
 
       before do
         allow(rank_unit1).to receive(:instance_of?).and_return(true)
@@ -184,8 +190,9 @@ describe Board do
     end
 
     context 'no unit at rank' do
-      let(:rank_unit1) { double('unit', color: :black, location: 'e2') }
-      let(:rank_unit2) { double('unit', color: :black, location: 'c2') }
+      let(:player) { double('player', color: :black) }
+      let(:rank_unit1) { double('unit', location: 'e2', off_board?: false, player: player) }
+      let(:rank_unit2) { double('unit', location: 'c2', off_board?: false, player: player) }
 
       before do
         allow(rank_board).to receive(:units).and_return([rank_unit1, rank_unit2])
@@ -198,8 +205,9 @@ describe Board do
     end
 
     context 'unit of same color but different type on rank' do
-      let(:rank_unit1) { double('unit', color: :white, location: 'b3') }
-      let(:rank_unit2) { double('unit', color: :white, location: 'h3') }
+      let(:player) { double('player', color: :white) }
+      let(:rank_unit1) { double('unit', location: 'b3', off_board?: false, player: player) }
+      let(:rank_unit2) { double('unit', location: 'h3', off_board?: false, player: player) }
 
       before do
         allow(rank_unit1).to receive(:instance_of?).and_return(false)
@@ -214,9 +222,11 @@ describe Board do
     end
 
     context 'unit of same type but different color on rank' do
-      let(:rank_unit1) { double('unit', color: :white, location: 'h8') }
+      let(:player) { double('player', color: :white) }
+      let(:rank_unit1) { double('unit', location: 'h8', off_board?: false, player: player) }
 
       before do
+        allow(rank_board).to receive(:units).and_return([rank_unit1])
         allow(rank_unit1).to receive(:class).and_return(:dummy_class)
       end
 

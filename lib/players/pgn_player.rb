@@ -3,7 +3,14 @@
 require './lib/player'
 
 class PgnPlayer < Player
-  attr_reader :game
+  attr_reader :game, :fast_forward
+
+  CLASS_ABBREV_MAP = [{ abbrev: nil, class: Pawn },
+                      { abbrev: 'K', class: King },
+                      { abbrev: 'Q', class: Queen },
+                      { abbrev: 'B', class: Bishop },
+                      { abbrev: 'R', class: Rook },
+                      { abbrev: 'N', class: Knight }].freeze
 
   def initialize(name, color, game, moves)
     super(name, color)
@@ -14,12 +21,15 @@ class PgnPlayer < Player
   end
 
   def input_unit_location
+    # submit draw if no more moves (but game isnt over)
+    return 'D' if @moves.none?
+
     check_auto_move_type unless check_fast_forward
     # check board status to find unit that can move to the location
     @current_move = @moves.shift
     file = @current_move[:unit_file]
     rank = @current_move[:unit_rank]
-    unit_class = @current_move[:unit_class]
+    unit_class = self.class.unit_abbrev_to_class(@current_move[:unit])
     move_location = @current_move[:move]
     possible_units = possible_location_units(file, rank, unit_class)
     possible_units.each do |unit|
@@ -36,7 +46,7 @@ class PgnPlayer < Player
 
   def input_promoted_unit_class
     check_fast_forward
-    @current_move[:promoted_unit_class]
+    @current_move[:promoted_unit]
   end
 
   private
@@ -59,10 +69,12 @@ class PgnPlayer < Player
   end
 
   def check_fast_forward
-    return unless @fast_forward
-
-    sleep(0.5)
-    true
+    if @fast_forward
+      sleep(0.001)
+    else
+      @fast_forward = game.other_player(self).fast_forward
+    end
+    @fast_forward
   end
 
   def check_auto_move_type
@@ -80,6 +92,10 @@ class PgnPlayer < Player
   end
 
   class << self
+    def unit_abbrev_to_class(abbrev)
+      CLASS_ABBREV_MAP.detect { |map| map[:abbrev] == abbrev }[:class]
+    end
+
     def valid_move_unit?(unit, unit_class)
       unit.player == self && unit.instance_of?(unit_class)
     end

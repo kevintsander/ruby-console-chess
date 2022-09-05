@@ -16,15 +16,18 @@ class Game
   include GameStatusChecker
   include GameFileHandler
 
-  attr_reader :board, :game_log, :players, :turn, :current_player
+  attr_reader :board, :game_log, :players, :turn, :current_player, :player_draw
 
   @current_player = nil
   @turn = 0
+  @player_draw = false
+  @pgn_fast_forward = false
 
   def initialize(players = [])
     @players = players
     @game_log = []
     @board = Board.new(game_log)
+    @allowed_actions_cache = {}
   end
 
   def add_players(players)
@@ -38,7 +41,11 @@ class Game
   end
 
   def game_over?
-    fifty_turn_draw? || any_stalemate? || any_checkmate?
+    turn&.positive? && (player_draw || fifty_turn_draw? || any_stalemate? || any_checkmate?)
+  end
+
+  def submit_draw
+    @player_draw = true
   end
 
   def both_players_played?
@@ -73,6 +80,7 @@ class Game
     end
 
     action.perform_action
+    @allowed_actions_cache = {} # reset allowed actions cache
     log_action(action)
     return if game_over?
 

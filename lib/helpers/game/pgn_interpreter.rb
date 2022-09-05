@@ -12,7 +12,7 @@ class PgnInterpreter
   TURN_REGEX = /(?<turn>\d*)[.]                                                                   # turn number
                 [\n\r\s]+                                                                         # space
                 (?<white>(?<move>
-                  (?:[KQBRN]?[abcdefgh]?[12345678]?x?(?:[abcdefgh][12345678])|O-O|O-O-O)(?:=[QBRN])?[+#]? # white move
+                  (?:[KQBRN]?[abcdefgh]?[12345678]?x?(?:[abcdefgh][12345678])|O-O-O|O-O)(?:=[QBRN])?[+#]? # white move
                   (?:[\r\n\s]*\{[^}]*\})?))
                 [\r\n\s]+                                                                         # space
                 (?<black>\g<move>)?                                                               # black move
@@ -20,19 +20,12 @@ class PgnInterpreter
 
   MOVE_REGEX = /(?:(?<unit>[KQBRN])?(?<unit_file>[abcdefgh])?(?<unit_rank>[12345678])?            # unit
                 (?<capture>x)?                                                                    # capture
-                (?<move>(?:[abcdefgh][12345678])|O-O|O-O-O))                                      # move
+                (?<move>(?:[abcdefgh][12345678])|O-O-O|O-O))                                      # move
                 (?:=(?<promoted_unit>[QRBN]))?                                                    # promoted unit
                 (?<status>[+#])?(?:[\r\n\s]*\{(?<comment>[^}]*)\})?                               # status (checkmate)
                 /x.freeze
 
   TAG_PAIR_REGEX = /\[(?<key>\S+)[\r\n\s]+"(?<value>[^"]*)"\]/.freeze
-
-  CLASS_ABBREV_MAP = [{ abbrev: nil, class: Pawn },
-                      { abbrev: 'K', class: King },
-                      { abbrev: 'Q', class: Queen },
-                      { abbrev: 'B', class: Bishop },
-                      { abbrev: 'R', class: Rook },
-                      { abbrev: 'N', class: Knight }].freeze
 
   def initialize(pgn_data)
     @pgn_data = pgn_data
@@ -43,11 +36,11 @@ class PgnInterpreter
   end
 
   def white_player_name
-    tags.select { |tag| tag[0].capitalize == 'White' }.first[0]
+    tags.select { |tag| tag[0].capitalize == 'White' }.first[1]
   end
 
   def black_player_name
-    tags.select { |tag| tag[0].capitalize == 'Black' }.first[0]
+    tags.select { |tag| tag[0].capitalize == 'Black' }.first[1]
   end
 
   def turns
@@ -68,19 +61,10 @@ class PgnInterpreter
   end
 
   class << self
-    def unit_abbrev_to_class(abbrev)
-      CLASS_ABBREV_MAP.detect { |map| map[:abbrev] == abbrev }[:class]
-    end
-
     def process_move_captures(move_captures)
       move_captures.map do |key, value|
+        # select King as unit for castling moves
         value = 'K' if key == 'unit' && ['O-O', 'O-O-O'].include?(move_captures['move'])
-        # convert unit abbreviations to classes
-        if %w[unit promoted_unit].include?(key)
-          key = "#{key}_class"
-          value = unit_abbrev_to_class(value)
-        end
-        key = 'unit_class' if key == 'unit'
         [key.to_sym, value]
       end.to_h
     end

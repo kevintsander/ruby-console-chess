@@ -121,26 +121,31 @@ module GameActionChecker
     true
   end
 
+  @allowed_actions_cache = {}
   def allowed_actions(unit)
-    allowed = []
-    return allowed unless unit.location
+    allowed_actions_cached = @allowed_actions_cache[unit]
+    unless allowed_actions_cached
+      allowed = []
+      return allowed unless unit.location
 
-    unit.allowed_actions_deltas.each do |(action_type, deltas)|
-      action_map = actions_map[action_type]
-      deltas.each do |delta|
-        move_location = board.delta_location(unit.location, delta)
-        next unless move_location
+      unit.allowed_actions_deltas.each do |(action_type, deltas)|
+        action_map = actions_map[action_type]
+        deltas.each do |delta|
+          move_location = board.delta_location(unit.location, delta)
+          next unless move_location
 
-        action_class = action_map[:class]
-        action = action_class.new(board, unit, move_location)
+          action_class = action_map[:class]
+          action = action_class.new(board, unit, move_location)
 
-        next unless action_map[:validator].call(action)
-        next if action_would_cause_check?(action)
+          next unless action_map[:validator].call(action)
+          next if action_would_cause_check?(action)
 
-        allowed << action
+          allowed << action
+        end
       end
+      @allowed_actions_cache[unit] = allowed
     end
-    allowed
+    @allowed_actions_cache[unit]
   end
 
   def units_with_actions(player)
@@ -155,16 +160,17 @@ module GameActionChecker
       return false
     end # for test game, do not perform this check because we need to test if moves would cause check
 
-    # create a test game with the king off board (to )
+    # create a test game
     new_test_game = get_test_game_copy
     new_test_game_units = new_test_game.board.units
-    test_unit = new_test_game_units.detect { |test_unit| test_unit.location == action.unit.location }
-    test_friendly_king = new_test_game_units.detect do |test_unit|
-      test_unit.is_a?(King) && test_unit.player == action.unit.player
+    test_unit = new_test_game_units.detect { |unit| unit.location == action.unit.location }
+    test_friendly_king = new_test_game_units.detect do |unit|
+      unit.is_a?(King) && unit.player == action.unit.player
     end
 
     # get a copy of the action to test
     test_action = action.class.new(new_test_game.board, test_unit, action.location)
+
     test_action.perform_action
 
     new_test_game.check?(test_friendly_king)

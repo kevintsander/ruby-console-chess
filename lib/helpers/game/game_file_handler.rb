@@ -3,7 +3,7 @@
 require 'yaml'
 
 module GameFileHandler
-  SAVE_DIR = File.join(Dir.home, 'kevin-chess')
+  SAVE_DIR = './saves/'
 
   def self.included(base)
     base.send(:include, InstanceMethods)

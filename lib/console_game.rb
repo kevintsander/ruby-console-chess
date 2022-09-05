@@ -18,21 +18,23 @@ class ConsoleGame
     display_introduction
     initialize_game
     play_turn until game.game_over?
-    display_game_over
+    display_grid_game_over
   end
 
   def play_turn
-    clear_display
-    display_grid
-    current_player = game.current_player
-    unit = select_unit(get_unit_location(current_player)) until unit
-    action = select_allowed_action(unit, get_action_location(current_player, unit)) until action
+    unit = nil
+    until unit
+      location_input = get_unit_location
+      return if check_player_draw(location_input)
+
+      unit = select_unit(location_input)
+    end
+    action = select_allowed_action(unit, get_action_location(unit)) until action
     game.perform_action(action)
     return unless game.can_promote_unit?(unit)
 
-    clear_display
-    display_grid
-    promoted_class = select_promoted_unit_class(get_promoted_unit_abbreviation(current_player)) until promoted_class
+    display_grid_promote_unit
+    promoted_class = select_promoted_unit_class(get_promoted_unit_abbreviation) until promoted_class
     game.perform_promote(unit, promoted_class)
   end
 

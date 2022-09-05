@@ -22,7 +22,7 @@ class ConsolePlayer < Player
   private
 
   def display_ask_unit_location
-    puts "#{name.capitalize}, what unit would you like to move?"
+    puts "#{name}, what unit would you like to move?"
   end
 
   def display_ask_move_location
