@@ -121,7 +121,6 @@ module GameActionChecker
     true
   end
 
-  @allowed_actions_cache = {}
   def allowed_actions(unit)
     allowed_actions_cached = @allowed_actions_cache[unit]
     unless allowed_actions_cached

@@ -58,24 +58,6 @@ class Board
     end
   end
 
-  def enemy_unit_at_location?(unit, location)
-    unit_at_location = unit_at(location)
-    unit_at_location && unit_at_location.player != unit.player
-  end
-
-  def unit_blocking_move?(unit, to_location, ignore_unit = nil)
-    check_location = unit.location
-    until check_location == to_location
-      check_location = step_location(check_location, to_location)
-      unit_at_location = unit_at(check_location)
-      unit_at_location = nil if unit_at_location == ignore_unit # allow a unit to be ignored (for castling)
-
-      # blocking if a unit found in the path, unless it is an unfriendly unit on the final space
-      return true if unit_at_location && (unit_at_location.player == unit.player || check_location != to_location)
-    end
-    false
-  end
-
   def friendly_units(unit)
     if block_given?
       units.each do |other|
