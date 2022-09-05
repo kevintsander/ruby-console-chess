@@ -22,10 +22,13 @@ class ConsoleGame
   end
 
   def play_turn
-    unit_location = get_unit_location
-    return if check_player_draw(unit_location)
+    unit = nil
+    until unit
+      location_input = get_unit_location
+      return if check_player_draw(location_input)
 
-    unit = select_unit(unit_location) until unit
+      unit = select_unit(location_input)
+    end
     action = select_allowed_action(unit, get_action_location(unit)) until action
     game.perform_action(action)
     return unless game.can_promote_unit?(unit)
@@ -50,11 +53,6 @@ class ConsoleGame
 
   def select_promoted_unit_class(unit_abbreviation)
     { 'Q' => Queen, 'R' => Rook, 'B' => Bishop, 'N' => Knight }[unit_abbreviation.upcase]
-  end
-
-  def check_player_draw(input)
-    game.submit_draw if input == '='
-    game.player_draw
   end
 
   def allowed_actions(unit)

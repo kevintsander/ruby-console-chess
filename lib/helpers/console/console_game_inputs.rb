@@ -12,6 +12,7 @@ module ConsoleGameInputs
     display_grid_available_units
     location = game.current_player.input_unit_location
     check_turn_menu_inputs(location)
+
     location
   end
 
@@ -74,6 +75,11 @@ module ConsoleGameInputs
   end
 
   private
+
+  def check_player_draw(input)
+    game.submit_draw if input == '='
+    game.player_draw
+  end
 
   def check_turn_menu_inputs(input)
     if input.upcase == 'S'
