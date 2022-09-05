@@ -70,7 +70,7 @@ class PgnPlayer < Player
 
   def check_fast_forward
     if @fast_forward
-      sleep(0.001)
+      sleep(0.7)
     else
       @fast_forward = game.other_player(self).fast_forward
     end

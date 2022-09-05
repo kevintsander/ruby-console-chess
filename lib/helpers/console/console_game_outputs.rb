@@ -2,7 +2,7 @@
 
 require 'colorize'
 
-SQUARE_COLORS = %i[on_light_blue on_light_black].freeze
+SQUARE_COLORS = %i[on_light_blue on_light_green].freeze
 
 module ConsoleGameOutputs
   def display_introduction
@@ -119,7 +119,10 @@ module ConsoleGameOutputs
 
   def game_turn_section
     current_player = game.current_player
-    "Turn: #{game.turn.to_s.ljust(2, ' ')}\tPlayer: #{current_player.name.colorize(background: current_player.color)}"
+    forecolor = current_player.color == :white ? :black : :white
+    "Turn: #{game.turn.to_s.ljust(2,
+                                  ' ')}\tPlayer: #{current_player.name.colorize(color: forecolor,
+                                                                                background: current_player.color)}"
   end
 
   def game_status_section
