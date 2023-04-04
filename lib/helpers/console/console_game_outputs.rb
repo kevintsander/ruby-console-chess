@@ -7,15 +7,26 @@ SQUARE_COLORS = %i[on_light_blue on_light_green].freeze
 module ConsoleGameOutputs
   def display_introduction
     puts <<~INTRO
-      CHESS
+      +++++++++++++++++++++++++++++++++++++++++++++++++
+      +                                               +
+      +          /////////////                        +
+      +         ///                                   +
+      +        ///      //   //  /////  /////  /////  +
+      +       ///      //   //  //     //     //      +
+      +      ///      ///////  /////  ////// //////   +
+      +     ///      //   //  //         //     //    +
+      +    ///      //   //  /////  ////// //////     +
+      +   ///                                         +
+      +  ////////////                                 +
+      +                                               +
+      +++++++++++++++++++++++++++++++++++++++++++++++++
 
         Welcome to Chess, the strategy game played since the 15th century!
 
         For each player, the battlefield contains:
           eight pawns, two rooks, two knights, two bishops, a king and a queen.
 
-      #{'    '}
-      The first player to outsmart the enemy and checkmate the opposing king will win!
+        The first player to outsmart the enemy and checkmate the opposing king will win!
 
     INTRO
   end
