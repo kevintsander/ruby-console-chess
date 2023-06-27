@@ -10,22 +10,22 @@ require './lib/units/knight'
 # This class interprets chess PGN files
 class PgnInterpreter
   TURN_REGEX = /(?<turn>\d*)[.]                                                                   # turn number
-                [\n\r\s]+                                                                         # space
+                [\n\r\s]?                                                                         # space
                 (?<white>(?<move>
                   (?:[KQBRN]?[abcdefgh]?[12345678]?x?(?:[abcdefgh][12345678])|O-O-O|O-O)(?:=[QBRN])?[+#]? # white move
                   (?:[\r\n\s]*\{[^}]*\})?))
                 [\r\n\s]+                                                                         # space
                 (?<black>\g<move>)?                                                               # black move
-                /x.freeze
+                /x
 
   MOVE_REGEX = /(?:(?<unit>[KQBRN])?(?<unit_file>[abcdefgh])?(?<unit_rank>[12345678])?            # unit
                 (?<capture>x)?                                                                    # capture
                 (?<move>(?:[abcdefgh][12345678])|O-O-O|O-O))                                      # move
                 (?:=(?<promoted_unit>[QRBN]))?                                                    # promoted unit
                 (?<status>[+#])?(?:[\r\n\s]*\{(?<comment>[^}]*)\})?                               # status (checkmate)
-                /x.freeze
+                /x
 
-  TAG_PAIR_REGEX = /\[(?<key>\S+)[\r\n\s]+"(?<value>[^"]*)"\]/.freeze
+  TAG_PAIR_REGEX = /\[(?<key>\S+)[\r\n\s]+"(?<value>[^"]*)"\]/
 
   def initialize(pgn_data)
     @pgn_data = pgn_data
@@ -56,7 +56,7 @@ class PgnInterpreter
     moves = {}
     moves[:turn] = turn['turn']
     moves[:white] = self.class.process_move_captures(MOVE_REGEX.match(turn['white']).named_captures)
-    moves[:black] = self.class.process_move_captures(MOVE_REGEX.match(turn['black']).named_captures)
+    moves[:black] = self.class.process_move_captures(MOVE_REGEX.match(turn['black']).named_captures) if turn['black']
     moves
   end
 
