@@ -25,7 +25,7 @@ class ConsoleGame
     unit = nil
     until unit
       location_input = get_unit_location
-      return if check_player_draw(location_input)
+      return if game.player_draw
 
       unit = select_unit(location_input)
     end

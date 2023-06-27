@@ -137,9 +137,9 @@ module ConsoleGameOutputs
   end
 
   def game_status_section
-    text = 'DRAW'.on_yellow if game.player_draw || game.fifty_turn_draw?
     text = 'CHECK'.on_yellow if game.any_check?
     text = 'CHECKMATE'.on_red if game.any_checkmate?
+    text = 'DRAW'.on_yellow if game.player_draw || game.fifty_turn_draw?
     text = 'STALEMATE'.on_red if game.any_stalemate?
     text
   end

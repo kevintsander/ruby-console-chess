@@ -77,7 +77,7 @@ module ConsoleGameInputs
   private
 
   def check_player_draw(input)
-    game.submit_draw if input == 'D'
+    game.submit_draw if input.upcase == 'D'
     game.player_draw
   end
 
@@ -86,6 +86,7 @@ module ConsoleGameInputs
       # save
       game.save_game(get_save_name)
     end
+    check_player_draw(input)
     check_exit_input(input)
   end
 
