@@ -20,6 +20,7 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
     builder (3.2.4)
+    chess-engine (1.0.0)
     colorize (0.8.1)
     concurrent-ruby (1.1.10)
     crass (1.0.6)
@@ -77,6 +78,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  chess-engine
   colorize
   rspec-rails
 

@@ -81,7 +81,7 @@ module ConsoleGameOutputs
 
         board_string += " #{row_id + 1} " if col_id == 0
         board_string += square_string.send(col_id.even? ? even_color : odd_color)
-        board_string += "\n" if col_id == Board::MAP[row_id].size - 1
+        board_string += "\n" if col_id == ChessEngine::Board::MAP[row_id].size - 1
       end
       even_color, odd_color = odd_color, even_color
     end
@@ -147,7 +147,7 @@ module ConsoleGameOutputs
   def available_units_section
     available_units = game.units_with_actions(game.current_player)
     full_text = 'UNITS WITH AVAILABLE ACTIONS'.underline + "\n"
-    grouped_units = available_units.group_by { |unit| unit.class }
+    grouped_units = available_units.group_by { |unit| unit.name }
     full_text = grouped_units.reduce(full_text) do |units_text, (unit_class, units)|
       unit_class_text = "#{unit_class}:".ljust(7, ' ')
       units_text += "  #{unit_class_text}"
@@ -160,7 +160,7 @@ module ConsoleGameOutputs
   end
 
   def allowed_actions_section(unit)
-    full_text = "AVAILABLE ACTIONS FOR #{unit.class.name.upcase} (#{unit.location}):".underline + "\n"
+    full_text = "AVAILABLE ACTIONS FOR #{unit.name.upcase} (#{unit.location}):".underline + "\n"
     action_locations_display_hash(unit).each do |action_display_name, locations|
       location_text = "  #{action_display_name.capitalize}:"
       action_header_length = location_text.size
@@ -183,16 +183,16 @@ module ConsoleGameOutputs
 
   def display_ask_which_save
     text = "Which save would you like to open? (enter number)\n"
-    Game.all_saves.each_with_index do |save, save_index|
-      text += "\t#{save_index + 1}) #{Game.file_name(save)}\n"
+    file_handler.all_saves.each_with_index do |save, save_index|
+      text += "\t#{save_index + 1}) #{file_handler.file_name(save)}\n"
     end
     puts text
   end
 
   def display_ask_which_pgn
     text = "Load a recent PGN file or enter a file path:\n"
-    Game.all_pgns.each_with_index do |pgn, pgn_index|
-      text += "\t#{pgn_index + 1}) #{Game.file_name(pgn)}\n"
+    file_handler.all_pgns.each_with_index do |pgn, pgn_index|
+      text += "\t#{pgn_index + 1}) #{file_handler.file_name(pgn)}\n"
     end
     puts text
   end

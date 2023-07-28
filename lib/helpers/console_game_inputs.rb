@@ -34,7 +34,7 @@ module ConsoleGameInputs
     input = gets.chomp
     check_initialize_menu_special_input(input)
     int_input = input.to_i
-    return int_input if int_input.between?(1, Game.all_saves.size)
+    return int_input if int_input.between?(1, file_handler.all_saves.size)
   end
 
   def get_pgn
@@ -42,10 +42,10 @@ module ConsoleGameInputs
     input = gets.chomp
     check_initialize_menu_special_input(input)
     int_input = input.to_i
-    if int_input.between?(1, Game.all_pgns.size)
-      Game.load_pgn_by_id(int_input)
+    if int_input.between?(1, file_handler.all_pgns.size)
+      file_handler.load_pgn_by_id(int_input)
     else
-      Game.load_pgn(input)
+      file_handler.load_pgn(input)
     end
   rescue StandardError => e
     display_file_load_error(message)
@@ -67,7 +67,7 @@ module ConsoleGameInputs
 
   def get_pgn_game
     pgn_data = get_pgn
-    new_game = Game.new
+    new_game = ChessEngine::Game.new
     new_game.add_players(create_pgn_players(pgn_data, new_game))
     new_game
   rescue StandardError
@@ -84,7 +84,7 @@ module ConsoleGameInputs
   def check_turn_menu_inputs(input)
     if input.upcase == 'S'
       # save
-      game.save_game(get_save_name)
+      file_handler.save_game(game, get_save_name)
     end
     check_player_draw(input)
     check_exit_input(input)

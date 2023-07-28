@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-require './lib/player'
-
 # Represents a console player
-class ConsolePlayer < Player
+class ConsolePlayer < ChessEngine::Player
   def input_unit_location
     display_ask_unit_location
     gets.chomp.downcase

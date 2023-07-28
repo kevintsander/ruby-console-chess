@@ -1,17 +1,17 @@
---- !ruby/object:Game
+--- !ruby/object:ChessEngine::Game
 players:
 - &1 !ruby/object:ConsolePlayer
-  name: kevin
+  name: Kevin
   color: :white
 - &2 !ruby/object:ConsolePlayer
-  name: ivy
+  name: Ivy
   color: :black
 game_log: &3
 - :turn: 1
-  :action: !ruby/object:NormalMoveCommand
-    board: &5 !ruby/object:Board
+  :action: !ruby/object:ChessEngine::Actions::NormalMoveCommand
+    board: &5 !ruby/object:ChessEngine::Board
       units:
-      - &14 !ruby/object:King
+      - &13 !ruby/object:ChessEngine::Units::King
         location: e1
         player: *1
         id: e1
@@ -19,7 +19,7 @@ game_log: &3
         initial_location: e1
         captured: false
         promoted: false
-      - &6 !ruby/object:Queen
+      - &6 !ruby/object:ChessEngine::Units::Queen
         location: d1
         player: *1
         id: d1
@@ -27,7 +27,7 @@ game_log: &3
         initial_location: d1
         captured: false
         promoted: false
-      - &7 !ruby/object:Bishop
+      - &7 !ruby/object:ChessEngine::Units::Bishop
         location: c1
         player: *1
         id: c1
@@ -35,7 +35,7 @@ game_log: &3
         initial_location: c1
         captured: false
         promoted: false
-      - &8 !ruby/object:Bishop
+      - &8 !ruby/object:ChessEngine::Units::Bishop
         location: f1
         player: *1
         id: f1
@@ -43,15 +43,15 @@ game_log: &3
         initial_location: f1
         captured: false
         promoted: false
-      - &9 !ruby/object:Knight
-        location: b1
+      - &4 !ruby/object:ChessEngine::Units::Knight
+        location: a3
         player: *1
         id: b1
         symbol: "♘"
         initial_location: b1
         captured: false
         promoted: false
-      - &15 !ruby/object:Knight
+      - &14 !ruby/object:ChessEngine::Units::Knight
         location: g1
         player: *1
         id: g1
@@ -59,7 +59,7 @@ game_log: &3
         initial_location: g1
         captured: false
         promoted: false
-      - &16 !ruby/object:Rook
+      - &15 !ruby/object:ChessEngine::Units::Rook
         location: a1
         player: *1
         id: a1
@@ -67,7 +67,7 @@ game_log: &3
         initial_location: a1
         captured: false
         promoted: false
-      - &17 !ruby/object:Rook
+      - &16 !ruby/object:ChessEngine::Units::Rook
         location: h1
         player: *1
         id: h1
@@ -75,15 +75,15 @@ game_log: &3
         initial_location: h1
         captured: false
         promoted: false
-      - &4 !ruby/object:Pawn
-        location: a4
+      - &17 !ruby/object:ChessEngine::Units::Pawn
+        location: a2
         player: *1
         id: a2
         symbol: "♙"
         initial_location: a2
         captured: false
         promoted: false
-      - &18 !ruby/object:Pawn
+      - &18 !ruby/object:ChessEngine::Units::Pawn
         location: b2
         player: *1
         id: b2
@@ -91,7 +91,7 @@ game_log: &3
         initial_location: b2
         captured: false
         promoted: false
-      - &19 !ruby/object:Pawn
+      - &19 !ruby/object:ChessEngine::Units::Pawn
         location: c2
         player: *1
         id: c2
@@ -99,7 +99,7 @@ game_log: &3
         initial_location: c2
         captured: false
         promoted: false
-      - &20 !ruby/object:Pawn
+      - &20 !ruby/object:ChessEngine::Units::Pawn
         location: d2
         player: *1
         id: d2
@@ -107,7 +107,7 @@ game_log: &3
         initial_location: d2
         captured: false
         promoted: false
-      - &21 !ruby/object:Pawn
+      - &21 !ruby/object:ChessEngine::Units::Pawn
         location: e2
         player: *1
         id: e2
@@ -115,7 +115,7 @@ game_log: &3
         initial_location: e2
         captured: false
         promoted: false
-      - &22 !ruby/object:Pawn
+      - &22 !ruby/object:ChessEngine::Units::Pawn
         location: f2
         player: *1
         id: f2
@@ -123,7 +123,7 @@ game_log: &3
         initial_location: f2
         captured: false
         promoted: false
-      - &23 !ruby/object:Pawn
+      - &23 !ruby/object:ChessEngine::Units::Pawn
         location: g2
         player: *1
         id: g2
@@ -131,7 +131,7 @@ game_log: &3
         initial_location: g2
         captured: false
         promoted: false
-      - &24 !ruby/object:Pawn
+      - &24 !ruby/object:ChessEngine::Units::Pawn
         location: h2
         player: *1
         id: h2
@@ -139,7 +139,7 @@ game_log: &3
         initial_location: h2
         captured: false
         promoted: false
-      - &25 !ruby/object:King
+      - &25 !ruby/object:ChessEngine::Units::King
         location: e8
         player: *2
         id: e8
@@ -147,7 +147,7 @@ game_log: &3
         initial_location: e8
         captured: false
         promoted: false
-      - &10 !ruby/object:Queen
+      - &9 !ruby/object:ChessEngine::Units::Queen
         location: d8
         player: *2
         id: d8
@@ -155,7 +155,7 @@ game_log: &3
         initial_location: d8
         captured: false
         promoted: false
-      - &11 !ruby/object:Bishop
+      - &10 !ruby/object:ChessEngine::Units::Bishop
         location: c8
         player: *2
         id: c8
@@ -163,7 +163,7 @@ game_log: &3
         initial_location: c8
         captured: false
         promoted: false
-      - &12 !ruby/object:Bishop
+      - &11 !ruby/object:ChessEngine::Units::Bishop
         location: f8
         player: *2
         id: f8
@@ -171,7 +171,7 @@ game_log: &3
         initial_location: f8
         captured: false
         promoted: false
-      - &13 !ruby/object:Knight
+      - &12 !ruby/object:ChessEngine::Units::Knight
         location: b8
         player: *2
         id: b8
@@ -179,7 +179,7 @@ game_log: &3
         initial_location: b8
         captured: false
         promoted: false
-      - &26 !ruby/object:Knight
+      - &26 !ruby/object:ChessEngine::Units::Knight
         location: g8
         player: *2
         id: g8
@@ -187,7 +187,7 @@ game_log: &3
         initial_location: g8
         captured: false
         promoted: false
-      - &27 !ruby/object:Rook
+      - &27 !ruby/object:ChessEngine::Units::Rook
         location: a8
         player: *2
         id: a8
@@ -195,7 +195,7 @@ game_log: &3
         initial_location: a8
         captured: false
         promoted: false
-      - &28 !ruby/object:Rook
+      - &28 !ruby/object:ChessEngine::Units::Rook
         location: h8
         player: *2
         id: h8
@@ -203,7 +203,7 @@ game_log: &3
         initial_location: h8
         captured: false
         promoted: false
-      - &29 !ruby/object:Pawn
+      - &29 !ruby/object:ChessEngine::Units::Pawn
         location: a7
         player: *2
         id: a7
@@ -211,7 +211,7 @@ game_log: &3
         initial_location: a7
         captured: false
         promoted: false
-      - &30 !ruby/object:Pawn
+      - &30 !ruby/object:ChessEngine::Units::Pawn
         location: b7
         player: *2
         id: b7
@@ -219,7 +219,7 @@ game_log: &3
         initial_location: b7
         captured: false
         promoted: false
-      - &31 !ruby/object:Pawn
+      - &31 !ruby/object:ChessEngine::Units::Pawn
         location: c7
         player: *2
         id: c7
@@ -227,7 +227,7 @@ game_log: &3
         initial_location: c7
         captured: false
         promoted: false
-      - &32 !ruby/object:Pawn
+      - &32 !ruby/object:ChessEngine::Units::Pawn
         location: d7
         player: *2
         id: d7
@@ -235,7 +235,7 @@ game_log: &3
         initial_location: d7
         captured: false
         promoted: false
-      - &33 !ruby/object:Pawn
+      - &33 !ruby/object:ChessEngine::Units::Pawn
         location: e7
         player: *2
         id: e7
@@ -243,7 +243,7 @@ game_log: &3
         initial_location: e7
         captured: false
         promoted: false
-      - &34 !ruby/object:Pawn
+      - &34 !ruby/object:ChessEngine::Units::Pawn
         location: f7
         player: *2
         id: f7
@@ -251,7 +251,7 @@ game_log: &3
         initial_location: f7
         captured: false
         promoted: false
-      - &35 !ruby/object:Pawn
+      - &35 !ruby/object:ChessEngine::Units::Pawn
         location: g7
         player: *2
         id: g7
@@ -259,7 +259,7 @@ game_log: &3
         initial_location: g7
         captured: false
         promoted: false
-      - &36 !ruby/object:Pawn
+      - &36 !ruby/object:ChessEngine::Units::Pawn
         location: h7
         player: *2
         id: h7
@@ -269,164 +269,158 @@ game_log: &3
         promoted: false
       game_log: *3
     unit: *4
-    location: a4
-    from_location: a2
+    location: a3
+    from_location: b1
     captured_unit:
 board: *5
 allowed_actions_cache:
   *6 : []
   *7 : []
   *8 : []
-  *9 :
-  - !ruby/object:NormalMoveCommand
+  *4 :
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
-    unit: *9
-    location: c3
+    unit: *4
+    location: c4
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
-    unit: *9
-    location: a3
+    unit: *4
+    location: b5
     from_location:
     captured_unit:
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
+    board: *5
+    unit: *4
+    location: b1
+    from_location:
+    captured_unit:
+  *9 : []
   *10 : []
   *11 : []
-  *12 : []
-  *13 :
-  - !ruby/object:NormalMoveCommand
+  *12 :
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
-    unit: *13
+    unit: *12
     location: c6
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
-    unit: *13
+    unit: *12
     location: a6
     from_location:
     captured_unit:
-  *14 : []
-  *15 :
-  - !ruby/object:NormalMoveCommand
+  *13 : []
+  *14 :
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
-    unit: *15
+    unit: *14
     location: h3
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
-    unit: *15
+    unit: *14
     location: f3
     from_location:
     captured_unit:
-  *16 :
-  - !ruby/object:NormalMoveCommand
+  *15 :
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
-    unit: *16
-    location: a2
+    unit: *15
+    location: b1
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
-    board: *5
-    unit: *16
-    location: a3
-    from_location:
-    captured_unit:
+  *16 : []
   *17 : []
-  *4 :
-  - !ruby/object:NormalMoveCommand
-    board: *5
-    unit: *4
-    location: a5
-    from_location:
-    captured_unit:
   *18 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *18
     location: b3
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *18
     location: b4
     from_location:
     captured_unit:
   *19 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *19
     location: c3
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *19
     location: c4
     from_location:
     captured_unit:
   *20 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *20
     location: d3
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *20
     location: d4
     from_location:
     captured_unit:
   *21 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *21
     location: e3
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *21
     location: e4
     from_location:
     captured_unit:
   *22 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *22
     location: f3
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *22
     location: f4
     from_location:
     captured_unit:
   *23 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *23
     location: g3
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *23
     location: g4
     from_location:
     captured_unit:
   *24 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *24
     location: h3
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *24
     location: h4
@@ -434,13 +428,13 @@ allowed_actions_cache:
     captured_unit:
   *25 : []
   *26 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *26
     location: h6
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *26
     location: f6
@@ -449,104 +443,104 @@ allowed_actions_cache:
   *27 : []
   *28 : []
   *29 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *29
     location: a6
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *29
     location: a5
     from_location:
     captured_unit:
   *30 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *30
     location: b6
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *30
     location: b5
     from_location:
     captured_unit:
   *31 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *31
     location: c6
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *31
     location: c5
     from_location:
     captured_unit:
   *32 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *32
     location: d6
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *32
     location: d5
     from_location:
     captured_unit:
   *33 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *33
     location: e6
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *33
     location: e5
     from_location:
     captured_unit:
   *34 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *34
     location: f6
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *34
     location: f5
     from_location:
     captured_unit:
   *35 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *35
     location: g6
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *35
     location: g5
     from_location:
     captured_unit:
   *36 :
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *36
     location: h6
     from_location:
     captured_unit:
-  - !ruby/object:NormalMoveCommand
+  - !ruby/object:ChessEngine::Actions::NormalMoveCommand
     board: *5
     unit: *36
     location: h5

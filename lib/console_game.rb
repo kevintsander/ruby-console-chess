@@ -1,18 +1,21 @@
 # frozen_string_literal: true
 
-require './lib/game'
-require './lib/players/console_player'
-require './lib/players/pgn_player'
-require './lib/helpers/console/console_game_outputs'
-require './lib/helpers/console/console_game_inputs'
-require './lib/helpers/game/pgn_interpreter'
+require 'chess-engine'
+require_relative './players/console_player'
+require_relative './players/pgn_player'
+require_relative './helpers/console_game_outputs'
+require_relative './helpers/console_game_inputs'
 
 # Represents a Chess game to be played in the console
 class ConsoleGame
   include ConsoleGameOutputs
   include ConsoleGameInputs
 
-  attr_reader :game
+  attr_reader :game, :file_handler
+
+  def initialize
+    @file_handler = ChessEngine::GameFileHandler.new('./saves/')
+  end
 
   def display_game
     display_introduction
@@ -27,28 +30,15 @@ class ConsoleGame
       location_input = get_unit_location
       return if game.player_draw
 
-      unit = select_unit(location_input)
+      unit = game.select_actionable_unit(location_input)
     end
-    action = select_allowed_action(unit, get_action_location(unit)) until action
+    action = game.select_allowed_action(unit, get_action_location(unit)) until action
     game.perform_action(action)
     return unless game.can_promote_unit?(unit)
 
     display_grid_promote_unit
     promoted_class = select_promoted_unit_class(get_promoted_unit_abbreviation) until promoted_class
     game.perform_promote(unit, promoted_class)
-  end
-
-  def select_unit(location)
-    current_player = game.current_player
-    unit_at_location = game.board.unit_at(location)
-    if unit_at_location&.player == current_player && game.units_with_actions(current_player).include?(unit_at_location)
-      unit = unit_at_location
-    end
-    unit
-  end
-
-  def select_allowed_action(unit, move_location)
-    game.allowed_actions(unit).detect { |action| action.location_notation == move_location }
   end
 
   def select_promoted_unit_class(unit_abbreviation)
@@ -64,11 +54,11 @@ class ConsoleGame
     new_game = nil
     case start_action
     when '1'
-      new_game = Game.new(create_console_players)
+      new_game = ChessEngine::Game.new(create_console_players)
       new_game.start
     when '2'
       save_id = get_save_id until save_id
-      new_game = Game.load_save_by_id(save_id)
+      new_game = file_handler.load_save_by_id(save_id)
     when '3'
       new_game = get_pgn_game until new_game
       new_game.start
@@ -88,7 +78,7 @@ class ConsoleGame
   end
 
   def create_pgn_players(pgn_data, game)
-    interpreter = PgnInterpreter.new(pgn_data)
+    interpreter = ChessEngine::PgnInterpreter.new(pgn_data)
     white_player_name = interpreter.white_player_name
     black_player_name = interpreter.black_player_name
     turns = interpreter.turns

@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
-require './lib/player'
-
-class PgnPlayer < Player
+class PgnPlayer < ChessEngine::Player
   attr_reader :game, :fast_forward
 
-  CLASS_ABBREV_MAP = [{ abbrev: nil, class: Pawn },
-                      { abbrev: 'K', class: King },
-                      { abbrev: 'Q', class: Queen },
-                      { abbrev: 'B', class: Bishop },
-                      { abbrev: 'R', class: Rook },
-                      { abbrev: 'N', class: Knight }].freeze
+  CLASS_ABBREV_MAP = [{ abbrev: nil, class: ChessEngine::Units::Pawn },
+                      { abbrev: 'K', class: ChessEngine::Units::King },
+                      { abbrev: 'Q', class: ChessEngine::Units::Queen },
+                      { abbrev: 'B', class: ChessEngine::Units::Bishop },
+                      { abbrev: 'R', class: ChessEngine::Units::Rook },
+                      { abbrev: 'N', class: ChessEngine::Units::Knight }].freeze
 
   def initialize(name, color, game, moves)
     super(name, color)
