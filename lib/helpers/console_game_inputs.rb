@@ -99,9 +99,9 @@ module ConsoleGameInputs
   end
 
   def check_exit_input(input)
-    if input.upcase == 'X'
-      # quit
-      exit
-    end
+    return unless input.upcase == 'X'
+
+    # quit
+    exit
   end
 end
