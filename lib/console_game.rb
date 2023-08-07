@@ -38,11 +38,13 @@ class ConsoleGame
 
     display_grid_promote_unit
     promoted_class = select_promoted_unit_class(get_promoted_unit_abbreviation) until promoted_class
+
     game.perform_promote(unit, promoted_class)
   end
 
   def select_promoted_unit_class(unit_abbreviation)
-    { 'Q' => Queen, 'R' => Rook, 'B' => Bishop, 'N' => Knight }[unit_abbreviation.upcase]
+    { 'Q' => ChessEngine::Units::Queen, 'R' => ChessEngine::Units::Rook, 'B' => ChessEngine::Units::Bishop,
+      'N' => ChessEngine::Units::Knight }[unit_abbreviation.upcase]
   end
 
   def allowed_actions(unit)
