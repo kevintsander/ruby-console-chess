@@ -86,7 +86,7 @@ class PgnPlayer < ChessEngine::Player
   end
 
   def find_allowed_action(unit, move_location)
-    game.allowed_actions(unit).detect { |action| action.location_notation == move_location }
+    game.unit_allowed_actions(unit).detect { |action| action.location_notation == move_location }
   end
 
   class << self

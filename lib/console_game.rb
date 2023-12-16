@@ -49,7 +49,7 @@ class ConsoleGame
   end
 
   def allowed_actions(unit)
-    game.allowed_actions(unit)
+    game.unit_allowed_actions(unit)
   end
 
   def initialize_game
