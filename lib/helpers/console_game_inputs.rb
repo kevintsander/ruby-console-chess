@@ -78,7 +78,6 @@ module ConsoleGameInputs
 
   def check_player_draw(input)
     game.submit_draw if input.upcase == 'D'
-    game.player_draw
   end
 
   def check_turn_menu_inputs(input)

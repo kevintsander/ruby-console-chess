@@ -28,18 +28,19 @@ class ConsoleGame
     unit = nil
     until unit
       location_input = get_unit_location
-      return if game.player_draw
+      return if game.status == :player_draw
 
       unit = game.select_actionable_unit(location_input)
     end
     action = game.select_allowed_action(unit, get_action_location(unit)) until action
     game.perform_action(action)
-    return unless game.can_promote_unit?(unit)
+    return unless game.status == :promoting
 
     display_grid_promote_unit
     promoted_class = select_promoted_unit_class(get_promoted_unit_abbreviation) until promoted_class
 
-    game.perform_promote(unit, promoted_class)
+    promote_action = game.select_promote_action(promoted_class)
+    game.perform_action(promote_action)
   end
 
   def select_promoted_unit_class(unit_abbreviation)

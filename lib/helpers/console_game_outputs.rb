@@ -35,27 +35,27 @@ module ConsoleGameOutputs
     current_player = game.current_player
     current_player_name = current_player.name
     other_player_name = game.other_player(current_player).name
-    if game.player_draw
+    if game.status == :player_draw
       <<~DRAW
 
         DRAW!#{' '}
         Players agreed to lay down their arms.
       DRAW
-    elsif game.fifty_turn_draw?
+    elsif game.status == :max_turn_draw
       <<~DRAW
 
         DRAW!
         Coult not determine a winner after fifty turns!
         It was a long and bloody battle...
       DRAW
-    elsif game.any_checkmate?
+    elsif game.status == :checkmate
       <<~CHECKMATE
 
         CHECKMATE!
         #{current_player_name} overwhelmed #{other_player_name}'s forces
         and captured the King!
       CHECKMATE
-    elsif game.any_stalemate?
+    elsif game.status == :stalemate
       <<~STALEMATE
 
         STALEMATE!
@@ -137,10 +137,10 @@ module ConsoleGameOutputs
   end
 
   def game_status_section
-    text = 'CHECK'.on_yellow if game.any_check?
-    text = 'CHECKMATE'.on_red if game.any_checkmate?
-    text = 'DRAW'.on_yellow if game.player_draw || game.fifty_turn_draw?
-    text = 'STALEMATE'.on_red if game.any_stalemate?
+    text = 'CHECK'.on_yellow if game.status == :check
+    text = 'CHECKMATE'.on_red if game.status == :checkmate
+    text = 'DRAW'.on_yellow if game.status == :player_draw || game.status == :max_turn_draw
+    text = 'STALEMATE'.on_red if game.status == :stalemate
     text
   end
 
