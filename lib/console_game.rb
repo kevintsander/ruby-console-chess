@@ -57,7 +57,7 @@ class ConsoleGame
     new_game = nil
     case start_action
     when '1'
-      create console_players
+      create_console_players
       new_game = ChessEngine::Game.new()
       new_game.start
     when '2'
@@ -82,7 +82,6 @@ class ConsoleGame
   end
 
   def create_pgn_players(pgn_data)
-    p pgn_data
     interpreter = ChessEngine::PgnInterpreter.new(pgn_data)
     white_player_name = interpreter.white_player_name
     black_player_name = interpreter.black_player_name
