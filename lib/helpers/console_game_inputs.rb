@@ -10,7 +10,7 @@ module ConsoleGameInputs
 
   def get_unit_location
     display_grid_available_units
-    location = game.current_player.input_unit_location
+    location = current_player.input_unit_location
     check_turn_menu_inputs(location)
 
     location
@@ -18,13 +18,13 @@ module ConsoleGameInputs
 
   def get_action_location(unit)
     display_grid_allowed_actions(unit)
-    location = game.current_player.input_move_location
+    location = current_player.input_move_location
     check_turn_menu_inputs(location)
     location
   end
 
   def get_promoted_unit_abbreviation
-    class_abbrev = game.current_player.input_promoted_unit_class
+    class_abbrev = current_player.input_promoted_unit_class
     check_turn_menu_inputs(class_abbrev)
     class_abbrev
   end
@@ -68,7 +68,7 @@ module ConsoleGameInputs
   def get_pgn_game
     pgn_data = get_pgn
     new_game = ChessEngine::Game.new
-    new_game.add_players(create_pgn_players(pgn_data, new_game))
+    create_pgn_players(pgn_data)
     new_game
   rescue StandardError
     display_pgn_interpreter_error

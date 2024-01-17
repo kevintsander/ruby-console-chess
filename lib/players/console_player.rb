@@ -1,7 +1,14 @@
 # frozen_string_literal: true
 
 # Represents a console player
-class ConsolePlayer < ChessEngine::Player
+class ConsolePlayer
+  attr_reader :name, :color
+  
+  def initialize(name, color)
+    @name = name
+    @color = color
+  end
+
   def input_unit_location
     display_ask_unit_location
     gets.chomp.downcase

@@ -32,9 +32,9 @@ module ConsoleGameOutputs
   end
 
   def game_over_section
-    current_player = game.current_player
     current_player_name = current_player.name
-    other_player_name = game.other_player(current_player).name
+    other_player_name = other_player(current_player).name
+
     if game.status == :player_draw
       <<~DRAW
 
@@ -91,19 +91,19 @@ module ConsoleGameOutputs
   def display_grid_available_units
     clear_display
     puts add_dynamic_section_to_grid(available_units_section)
-    puts '(D = Draw, S = Save, X = Exit)' if game.current_player.is_a?(ConsolePlayer)
+    puts '(D = Draw, S = Save, X = Exit)' if current_player.is_a?(ConsolePlayer)
   end
 
   def display_grid_allowed_actions(unit)
     clear_display
     puts add_dynamic_section_to_grid(allowed_actions_section(unit))
-    puts '(S = Save, X = Exit)' if game.current_player.is_a?(ConsolePlayer)
+    puts '(S = Save, X = Exit)' if current_player.is_a?(ConsolePlayer)
   end
 
   def display_grid_promote_unit
     clear_display
     puts add_dynamic_section_to_grid(promote_unit_section)
-    puts '(S = Save, X = Exit)' if game.current_player.is_a?(ConsolePlayer)
+    puts '(S = Save, X = Exit)' if current_player.is_a?(ConsolePlayer)
   end
 
   def display_grid_game_over
@@ -129,11 +129,10 @@ module ConsoleGameOutputs
   end
 
   def game_turn_section
-    current_player = game.current_player
     forecolor = current_player.color == :white ? :black : :white
     "Turn: #{game.turn.to_s.ljust(2,
                                   ' ')}\tPlayer: #{current_player.name.colorize(color: forecolor,
-                                                                                background: current_player.color)}"
+                                                                                 background: current_player.color)}"
   end
 
   def game_status_section
@@ -145,7 +144,7 @@ module ConsoleGameOutputs
   end
 
   def available_units_section
-    available_units = game.units_with_actions(game.current_player)
+    available_units = game.units_with_actions(game.current_color)
     full_text = 'UNITS WITH AVAILABLE ACTIONS'.underline + "\n"
     grouped_units = available_units.group_by { |unit| unit.name }
     full_text = grouped_units.reduce(full_text) do |units_text, (unit_class, units)|

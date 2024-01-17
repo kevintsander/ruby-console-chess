@@ -57,7 +57,8 @@ class ConsoleGame
     new_game = nil
     case start_action
     when '1'
-      new_game = ChessEngine::Game.new(create_console_players)
+      create console_players
+      new_game = ChessEngine::Game.new()
       new_game.start
     when '2'
       save_id = get_save_id until save_id
@@ -70,9 +71,9 @@ class ConsoleGame
   end
 
   def create_console_players
-    white_player = create_console_player(:white)
-    black_player = create_console_player(:black)
-    [white_player, black_player]
+    @white_player = create_console_player(:white)
+    @black_player = create_console_player(:black)
+    [@white_player, @black_player]
   end
 
   def create_console_player(color)
@@ -80,15 +81,24 @@ class ConsoleGame
     ConsolePlayer.new(name, color)
   end
 
-  def create_pgn_players(pgn_data, game)
+  def create_pgn_players(pgn_data)
+    p pgn_data
     interpreter = ChessEngine::PgnInterpreter.new(pgn_data)
     white_player_name = interpreter.white_player_name
     black_player_name = interpreter.black_player_name
     turns = interpreter.turns
     white_player_moves = turns.map { |turn| turn[:white] }
     black_player_moves = turns.map { |turn| turn[:black] }
-    white_player = PgnPlayer.new(white_player_name, :white, game, white_player_moves)
-    black_player = PgnPlayer.new(black_player_name, :black, game, black_player_moves)
-    [white_player, black_player]
+    @white_player = PgnPlayer.new(white_player_name, :white, self, white_player_moves)
+    @black_player = PgnPlayer.new(black_player_name, :black, self, black_player_moves)
+    [@white_player, @black_player]
+  end
+
+  def current_player
+    { white: @white_player, black: @black_player }[game.current_color]
+  end
+
+  def other_player(player)
+    player == @black_player ? @white_player : @black_player
   end
 end

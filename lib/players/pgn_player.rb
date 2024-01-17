@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class PgnPlayer < ChessEngine::Player
-  attr_reader :game, :fast_forward
+class PgnPlayer
+  attr_reader :name, :color, :fast_forward
 
   CLASS_ABBREV_MAP = [{ abbrev: nil, class: ChessEngine::Units::Pawn },
                       { abbrev: 'K', class: ChessEngine::Units::King },
@@ -10,9 +10,10 @@ class PgnPlayer < ChessEngine::Player
                       { abbrev: 'R', class: ChessEngine::Units::Rook },
                       { abbrev: 'N', class: ChessEngine::Units::Knight }].freeze
 
-  def initialize(name, color, game, moves)
-    super(name, color)
-    @game = game
+  def initialize(name, color, console_game, moves)
+    @name = name
+    @color = color
+    @console_game = console_game
     @moves = moves
     @current_move = nil
     @fast_forward = false
@@ -50,6 +51,7 @@ class PgnPlayer < ChessEngine::Player
   private
 
   def possible_location_units(file, rank, unit_class)
+    game = @console_game.game
     if file && rank
       unit_at_location = game.board.unit_at("#{unit_file}#{unit_rank}")
       valid_move_unit?(unit_at_location, unit_class) ? [unit_at_location] : []
@@ -58,7 +60,7 @@ class PgnPlayer < ChessEngine::Player
     elsif rank
       game.board.units_at_rank(rank, @color, unit_class)
     else
-      game.board.units.select { |unit| unit.player == self && unit.instance_of?(unit_class) }
+      game.board.units.select { |unit| unit.color == self.color && unit.instance_of?(unit_class) }
     end
   end
 
@@ -70,7 +72,7 @@ class PgnPlayer < ChessEngine::Player
     if @fast_forward
       sleep(0.7)
     else
-      @fast_forward = game.other_player(self).fast_forward
+      @fast_forward = @console_game.other_player(self).fast_forward
     end
     @fast_forward
   end
@@ -86,7 +88,7 @@ class PgnPlayer < ChessEngine::Player
   end
 
   def find_allowed_action(unit, move_location)
-    game.unit_allowed_actions(unit).detect { |action| action.location_notation == move_location }
+    @console_game.game.unit_allowed_actions(unit).detect { |action| action.location_notation == move_location }
   end
 
   class << self
